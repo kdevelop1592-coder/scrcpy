@@ -26,8 +26,8 @@ class MicroscopeApp(ctk.CTk):
         super().__init__()
 
         self.title("🔬 스마트폰 대물렌즈 / 현미경 모니터 컨트롤러")
-        self.geometry("740x720")
-        self.minsize(680, 650)
+        self.geometry("820x820")
+        self.minsize(780, 750)
 
         self.manager = ScrcpyManager(DEFAULT_SCRCPY_DIR)
 
@@ -159,20 +159,58 @@ class MicroscopeApp(ctk.CTk):
         tip_lbl = ctk.CTkLabel(vid_frame, text="💡 카메라 스트림 중 단축키 Mod(Alt)+O 로 폰 화면을 끌 수 있습니다.", font=ctk.CTkFont(size=11), text_color="#8B949E")
         tip_lbl.grid(row=2, column=2, columnspan=2, padx=10, pady=8, sticky="w")
 
-        # 4. 수동 초점 제어 안내 섹션
-        focus_frame = ctk.CTkFrame(self, corner_radius=10)
-        focus_frame.pack(fill="x", padx=15, pady=5)
+        # 4. 실시간 관찰 단축키 가이드 섹션
+        shortcut_frame = ctk.CTkFrame(self, corner_radius=10)
+        shortcut_frame.pack(fill="x", padx=15, pady=5)
 
-        ctk.CTkLabel(focus_frame, text="🔍 수동 초점(Manual Focus) 미세 조절", font=ctk.CTkFont(size=14, weight="bold"), text_color="#3B8ED0").grid(row=0, column=0, columnspan=4, padx=10, pady=(10, 5), sticky="w")
+        ctk.CTkLabel(
+            shortcut_frame,
+            text="⌨️ 관찰 창 실시간 조작 단축키 가이드",
+            font=ctk.CTkFont(size=14, weight="bold"),
+            text_color="#3B8ED0"
+        ).grid(row=0, column=0, columnspan=2, padx=12, pady=(10, 8), sticky="w")
 
-        info_focus = (
-            "• [Alt + Shift + O]: 초점 가까이 당기기 (Focus Nearer, 접사 방향)\n"
-            "• [Alt + O]: 초점 멀리 밀기 (Focus Farther, 원경 방향)\n"
-            "• [Alt + R]: 자동 초점(AF) 복원 및 리셋\n"
-            "※ 초점 조절 키를 누르면 자동 초점(AF)이 즉시 비활성화되어 렌즈 떨림이 사라집니다."
-        )
-        focus_lbl = ctk.CTkLabel(focus_frame, text=info_focus, justify="left", font=ctk.CTkFont(size=12))
-        focus_lbl.grid(row=1, column=0, columnspan=4, padx=15, pady=(0, 10), sticky="w")
+        # 2단 그리드로 단축키 카드 배치
+        # 좌측: 초점 & 줌
+        col1_frame = ctk.CTkFrame(shortcut_frame, fg_color="#1F2428", corner_radius=8)
+        col1_frame.grid(row=1, column=0, padx=(12, 6), pady=(0, 10), sticky="nsew")
+
+        ctk.CTkLabel(col1_frame, text="🔍 초점 및 확대 (Focus & Zoom)", font=ctk.CTkFont(weight="bold", size=12), text_color="#58A6FF").pack(anchor="w", padx=10, pady=(6, 4))
+        
+        shortcuts_left = [
+            ("Alt + Shift + O", "초점 가까이 당기기 (초근접 접사)"),
+            ("Alt + O", "초점 멀리 밀기 (원경)"),
+            ("Alt + R", "자동 초점(AF) 복원 / 리셋"),
+            ("Alt + ↑ / ↓", "카메라 센서 디지털 줌 확대 / 축소"),
+            ("Alt + T / Shift+T", "카메라 플래시(토치) 켜기 / 끄기")
+        ]
+        for key, desc in shortcuts_left:
+            row = ctk.CTkFrame(col1_frame, fg_color="transparent")
+            row.pack(fill="x", padx=10, pady=2)
+            ctk.CTkLabel(row, text=key, font=ctk.CTkFont(family="Consolas", weight="bold", size=11), text_color="#F0883E", width=140, anchor="w").pack(side="left")
+            ctk.CTkLabel(row, text=desc, font=ctk.CTkFont(size=11), anchor="w").pack(side="left")
+
+        # 우측: 화면 회전 & 전체화면 & 유틸
+        col2_frame = ctk.CTkFrame(shortcut_frame, fg_color="#1F2428", corner_radius=8)
+        col2_frame.grid(row=1, column=1, padx=(6, 12), pady=(0, 10), sticky="nsew")
+
+        ctk.CTkLabel(col2_frame, text="🔄 화면 제어 & 디스플레이", font=ctk.CTkFont(weight="bold", size=12), text_color="#58A6FF").pack(anchor="w", padx=10, pady=(6, 4))
+
+        shortcuts_right = [
+            ("Alt + Shift + ↑ / ↓", "실시간 상하 반전 (Vertical Flip)"),
+            ("Alt + Shift + ← / →", "실시간 좌우 반전 (Horizontal Flip)"),
+            ("Alt + ← / →", "화면 90도 회전 (Rotate)"),
+            ("F11  (or Alt + F)", "전체화면(Fullscreen) 토글"),
+            ("Alt + G / Alt + W", "1:1 원본 비율 / 창 크기 맞춤")
+        ]
+        for key, desc in shortcuts_right:
+            row = ctk.CTkFrame(col2_frame, fg_color="transparent")
+            row.pack(fill="x", padx=10, pady=2)
+            ctk.CTkLabel(row, text=key, font=ctk.CTkFont(family="Consolas", weight="bold", size=11), text_color="#F0883E", width=140, anchor="w").pack(side="left")
+            ctk.CTkLabel(row, text=desc, font=ctk.CTkFont(size=11), anchor="w").pack(side="left")
+
+        shortcut_frame.grid_columnconfigure(0, weight=1)
+        shortcut_frame.grid_columnconfigure(1, weight=1)
 
         # 5. 관찰 실행 버튼 섹션
         action_frame = ctk.CTkFrame(self, fg_color="transparent")
