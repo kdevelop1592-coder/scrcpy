@@ -1,0 +1,9 @@
+{
+    "camera_id": "0",
+    "orientation": "0",
+    "flip_v": true,
+    "flip_h": true,
+    "resolution": "1920x1080",
+    "fps": "60",
+    "stay_awake": true
+}

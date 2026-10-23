@@ -74,6 +74,8 @@ public class CameraCapture extends SurfaceCapture {
     private Size captureSize;
     private Size videoSize; // after OpenGL transforms
     private Range<Float> zoomRange;
+    private Float minFocusDistance;
+    private float currentFocusDistance = 0.0f; // 0.0f = infinity (diopters)
 
     private AffineMatrix transform;
     private OpenGLRunner glRunner;
@@ -306,6 +308,8 @@ public class CameraCapture extends SurfaceCapture {
                 try {
                     CameraCharacteristics characteristics = cameraManager.getCameraCharacteristics(cameraId);
                     zoomRange = characteristics.get(CameraCharacteristics.CONTROL_ZOOM_RATIO_RANGE);
+                    minFocusDistance = characteristics.get(CameraCharacteristics.LENS_INFO_MINIMUM_FOCUS_DISTANCE);
+                    Ln.i("Camera minimum focus distance (diopters): " + minFocusDistance);
                 } catch (CameraAccessException e) {
                     Ln.w("Could not get camera characteristics");
                 }
@@ -531,6 +535,54 @@ public class CameraCapture extends SurfaceCapture {
         }
 
         return zoomRange.clamp(value);
+    }
+
+    public void adjustFocus(boolean nearer) {
+        cameraHandler.post(() -> {
+            assertCameraThread();
+            if (currentSession != null && requestBuilder != null) {
+                float maxDist = (minFocusDistance != null && minFocusDistance > 0) ? minFocusDistance : 10.0f;
+                float step = Math.max(0.1f, maxDist / 40.0f); // 40단계 미세조절
+
+                if (nearer) {
+                    currentFocusDistance += step;
+                } else {
+                    currentFocusDistance -= step;
+                }
+
+                if (currentFocusDistance < 0.0f) {
+                    currentFocusDistance = 0.0f; // 무한대
+                } else if (currentFocusDistance > maxDist) {
+                    currentFocusDistance = maxDist; // 최접사
+                }
+
+                try {
+                    Ln.i(String.format("Set manual focus distance: %.2f / %.2f (AF OFF)", currentFocusDistance, maxDist));
+                    requestBuilder.set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_OFF);
+                    requestBuilder.set(CaptureRequest.LENS_FOCUS_DISTANCE, currentFocusDistance);
+                    CaptureRequest request = requestBuilder.build();
+                    setRepeatingRequest(currentSession, request);
+                } catch (CameraAccessException e) {
+                    Ln.e("Camera manual focus error", e);
+                }
+            }
+        });
+    }
+
+    public void resetAutoFocus() {
+        cameraHandler.post(() -> {
+            assertCameraThread();
+            if (currentSession != null && requestBuilder != null) {
+                try {
+                    Ln.i("Reset to Auto Focus (CONTINUOUS_PICTURE)");
+                    requestBuilder.set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE);
+                    CaptureRequest request = requestBuilder.build();
+                    setRepeatingRequest(currentSession, request);
+                } catch (CameraAccessException e) {
+                    Ln.e("Camera auto focus reset error", e);
+                }
+            }
+        });
     }
 
     private void assertCameraThread() {
