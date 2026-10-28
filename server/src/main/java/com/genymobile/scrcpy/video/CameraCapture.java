@@ -25,6 +25,7 @@ import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CaptureFailure;
 import android.hardware.camera2.CaptureRequest;
+import android.hardware.camera2.params.MeteringRectangle;
 import android.hardware.camera2.params.OutputConfiguration;
 import android.hardware.camera2.params.SessionConfiguration;
 import android.hardware.camera2.params.StreamConfigurationMap;
@@ -75,7 +76,12 @@ public class CameraCapture extends SurfaceCapture {
     private Size videoSize; // after OpenGL transforms
     private Range<Float> zoomRange;
     private Float minFocusDistance;
+    private Rect activeArraySize;
+    private Float maxDigitalZoom;
     private float currentFocusDistance = 0.0f; // 0.0f = infinity (diopters)
+    private float targetZoomLevel = 1.0f;
+    private float targetCenterXRatio = 0.5f;
+    private float targetCenterYRatio = 0.5f;
 
     private AffineMatrix transform;
     private OpenGLRunner glRunner;
@@ -309,7 +315,9 @@ public class CameraCapture extends SurfaceCapture {
                     CameraCharacteristics characteristics = cameraManager.getCameraCharacteristics(cameraId);
                     zoomRange = characteristics.get(CameraCharacteristics.CONTROL_ZOOM_RATIO_RANGE);
                     minFocusDistance = characteristics.get(CameraCharacteristics.LENS_INFO_MINIMUM_FOCUS_DISTANCE);
-                    Ln.i("Camera minimum focus distance (diopters): " + minFocusDistance);
+                    activeArraySize = characteristics.get(CameraCharacteristics.SENSOR_INFO_ACTIVE_ARRAY_SIZE);
+                    maxDigitalZoom = characteristics.get(CameraCharacteristics.SCALER_AVAILABLE_MAX_DIGITAL_ZOOM);
+                    Ln.i("Camera characteristics - focusDist: " + minFocusDistance + ", activeArray: " + activeArraySize + ", maxDigitalZoom: " + maxDigitalZoom);
                 } catch (CameraAccessException e) {
                     Ln.w("Could not get camera characteristics");
                 }
@@ -520,12 +528,121 @@ public class CameraCapture extends SurfaceCapture {
         });
     }
 
+    public void zoomAt(com.genymobile.scrcpy.model.Position position, float scrollDelta) {
+        cameraHandler.post(() -> {
+            assertCameraThread();
+            if (currentSession != null && requestBuilder != null) {
+                // 특정 지점 비율 업데이트
+                if (position != null) {
+                    com.genymobile.scrcpy.model.Point pt = position.getPoint();
+                    com.genymobile.scrcpy.model.Size screenSize = position.getScreenSize();
+                    if (screenSize.getWidth() > 0 && screenSize.getHeight() > 0) {
+                        targetCenterXRatio = Math.max(0.05f, Math.min(0.95f, (float) pt.getX() / screenSize.getWidth()));
+                        targetCenterYRatio = Math.max(0.05f, Math.min(0.95f, (float) pt.getY() / screenSize.getHeight()));
+                    }
+                }
+
+                float factor = scrollDelta > 0 ? 1.15f : 0.87f;
+                float newZoom = targetZoomLevel * factor;
+                float maxZ = 10.0f;
+                if (maxDigitalZoom != null && maxDigitalZoom > 1.0f) {
+                    maxZ = maxDigitalZoom;
+                } else if (zoomRange != null && zoomRange.getUpper() != null) {
+                    maxZ = zoomRange.getUpper();
+                }
+
+                targetZoomLevel = Math.max(1.0f, Math.min(maxZ, newZoom));
+                applyCropZoom();
+            }
+        });
+    }
+
+    public void pan(float deltaXRatio, float deltaYRatio) {
+        cameraHandler.post(() -> {
+            assertCameraThread();
+            if (currentSession != null && requestBuilder != null) {
+                targetCenterXRatio = Math.max(0.05f, Math.min(0.95f, targetCenterXRatio + deltaXRatio));
+                targetCenterYRatio = Math.max(0.05f, Math.min(0.95f, targetCenterYRatio + deltaYRatio));
+                applyCropZoom();
+            }
+        });
+    }
+
+    public void resetZoom() {
+        cameraHandler.post(() -> {
+            assertCameraThread();
+            if (currentSession != null && requestBuilder != null) {
+                targetZoomLevel = 1.0f;
+                targetCenterXRatio = 0.5f;
+                targetCenterYRatio = 0.5f;
+                applyCropZoom();
+            }
+        });
+    }
+
+    private void applyCropZoom() {
+        assertCameraThread();
+        Rect sensorRect = activeArraySize;
+        if (sensorRect == null) {
+            sensorRect = new Rect(0, 0, captureSize.getWidth(), captureSize.getHeight());
+        }
+
+        int origW = sensorRect.width();
+        int origH = sensorRect.height();
+
+        if (targetZoomLevel <= 1.02f) {
+            // 1.0x 배율 복원: 전체 센서 영역으로 리셋
+            try {
+                Ln.i("Reset zoom to 1.0x (full frame)");
+                requestBuilder.set(CaptureRequest.SCALER_CROP_REGION, sensorRect);
+                CaptureRequest request = requestBuilder.build();
+                setRepeatingRequest(currentSession, request);
+            } catch (CameraAccessException e) {
+                Ln.e("Reset zoom error", e);
+            }
+            return;
+        }
+
+        // 지점 중심의 크롭 사각형 계산
+        int cropW = (int) (origW / targetZoomLevel);
+        int cropH = (int) (origH / targetZoomLevel);
+
+        int centerX = sensorRect.left + (int) (targetCenterXRatio * origW);
+        int centerY = sensorRect.top + (int) (targetCenterYRatio * origH);
+
+        int cropLeft = centerX - cropW / 2;
+        int cropTop = centerY - cropH / 2;
+
+        // 센서 경계 클램핑
+        if (cropLeft < sensorRect.left) {
+            cropLeft = sensorRect.left;
+        } else if (cropLeft + cropW > sensorRect.right) {
+            cropLeft = sensorRect.right - cropW;
+        }
+
+        if (cropTop < sensorRect.top) {
+            cropTop = sensorRect.top;
+        } else if (cropTop + cropH > sensorRect.bottom) {
+            cropTop = sensorRect.bottom - cropH;
+        }
+
+        Rect cropRect = new Rect(cropLeft, cropTop, cropLeft + cropW, cropTop + cropH);
+        try {
+            Ln.i(String.format("Apply point-centered zoom: %.2fx at (%.2f, %.2f) -> crop: %s", targetZoomLevel, targetCenterXRatio, targetCenterYRatio, cropRect));
+            requestBuilder.set(CaptureRequest.SCALER_CROP_REGION, cropRect);
+            CaptureRequest request = requestBuilder.build();
+            setRepeatingRequest(currentSession, request);
+        } catch (CameraAccessException e) {
+            Ln.e("Apply point-centered zoom error", e);
+        }
+    }
+
     public void zoomIn() {
-        zoom(true);
+        zoomAt(null, 1f); // crop 기반 줌 (구형 기기 / CONTROL_ZOOM_RATIO 미지원 대응)
     }
 
     public void zoomOut() {
-        zoom(false);
+        zoomAt(null, -1f);
     }
 
     private float clampZoom(float value) {
@@ -575,11 +692,75 @@ public class CameraCapture extends SurfaceCapture {
             if (currentSession != null && requestBuilder != null) {
                 try {
                     Ln.i("Reset to Auto Focus (CONTINUOUS_PICTURE)");
+                    requestBuilder.set(CaptureRequest.CONTROL_AF_TRIGGER, CaptureRequest.CONTROL_AF_TRIGGER_CANCEL);
+                    requestBuilder.set(CaptureRequest.CONTROL_AF_REGIONS, null);
+                    requestBuilder.set(CaptureRequest.CONTROL_AE_REGIONS, null);
                     requestBuilder.set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE);
                     CaptureRequest request = requestBuilder.build();
                     setRepeatingRequest(currentSession, request);
                 } catch (CameraAccessException e) {
                     Ln.e("Camera auto focus reset error", e);
+                }
+            }
+        });
+    }
+
+    public void setFocusPoint(com.genymobile.scrcpy.model.Position position) {
+        cameraHandler.post(() -> {
+            assertCameraThread();
+            if (currentSession != null && requestBuilder != null && position != null) {
+                try {
+                    com.genymobile.scrcpy.model.Point pt = position.getPoint();
+                    com.genymobile.scrcpy.model.Size screenSize = position.getScreenSize();
+
+                    if (screenSize.getWidth() <= 0 || screenSize.getHeight() <= 0) {
+                        return;
+                    }
+
+                    // 0.0 ~ 1.0 비율 좌표 계산
+                    float rx = Math.max(0f, Math.min(1f, (float) pt.getX() / screenSize.getWidth()));
+                    float ry = Math.max(0f, Math.min(1f, (float) pt.getY() / screenSize.getHeight()));
+
+                    Rect sensorRect = activeArraySize;
+                    if (sensorRect == null) {
+                        sensorRect = new Rect(0, 0, captureSize.getWidth(), captureSize.getHeight());
+                    }
+
+                    int centerX = sensorRect.left + (int) (rx * sensorRect.width());
+                    int centerY = sensorRect.top + (int) (ry * sensorRect.height());
+
+                    // 포커스 측광 박스 크기 (센서 기준 약 12% 크기)
+                    int boxHalfW = Math.max(20, sensorRect.width() / 16);
+                    int boxHalfH = Math.max(20, sensorRect.height() / 16);
+
+                    int left = Math.max(sensorRect.left, centerX - boxHalfW);
+                    int top = Math.max(sensorRect.top, centerY - boxHalfH);
+                    int right = Math.min(sensorRect.right, centerX + boxHalfW);
+                    int bottom = Math.min(sensorRect.bottom, centerY + boxHalfH);
+
+                    Rect focusRect = new Rect(left, top, right, bottom);
+                    MeteringRectangle meteringRect = new MeteringRectangle(focusRect, MeteringRectangle.METERING_WEIGHT_MAX);
+                    MeteringRectangle[] afRegions = new MeteringRectangle[]{meteringRect};
+
+                    Ln.i(String.format("Tap-to-Focus trigger at (%d, %d) -> region: %s", pt.getX(), pt.getY(), focusRect));
+
+                    // 1. 수동 모드 잠금 해제: AF 취소 및 수동 초점 거리 해제
+                    requestBuilder.set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_AUTO);
+                    requestBuilder.set(CaptureRequest.CONTROL_AF_TRIGGER, CaptureRequest.CONTROL_AF_TRIGGER_CANCEL);
+                    requestBuilder.set(CaptureRequest.CONTROL_AF_REGIONS, afRegions);
+                    requestBuilder.set(CaptureRequest.CONTROL_AE_REGIONS, afRegions);
+                    currentSession.capture(requestBuilder.build(), null, cameraHandler);
+
+                    // 2. AF 트리거 시작 (원샷 포커싱 가동)
+                    requestBuilder.set(CaptureRequest.CONTROL_AF_TRIGGER, CaptureRequest.CONTROL_AF_TRIGGER_START);
+                    currentSession.capture(requestBuilder.build(), null, cameraHandler);
+
+                    // 3. 트리거 상태 IDLE로 복귀 후 반복 캡처 유지
+                    requestBuilder.set(CaptureRequest.CONTROL_AF_TRIGGER, CaptureRequest.CONTROL_AF_TRIGGER_IDLE);
+                    setRepeatingRequest(currentSession, requestBuilder.build());
+                    setRepeatingRequest(currentSession, requestBuilder.build());
+                } catch (CameraAccessException e) {
+                    Ln.e("Camera tap-to-focus error", e);
                 }
             }
         });

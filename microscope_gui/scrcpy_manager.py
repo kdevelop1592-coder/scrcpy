@@ -96,6 +96,8 @@ class ScrcpyManager:
             "--video-source=camera",
             f"--camera-id={camera_id}",
             f"--capture-orientation={capture_orient}",
+            "--window-title=Microscope Camera Stream",
+            "--mouse=sdk",
             "--video-buffer=0"  # 지연 최소화
         ]
 

@@ -440,6 +440,20 @@ public class Controller implements AsyncProcessor, VirtualDisplayListener {
                     // 카메라 모드에서 오토포커스(AF) 리셋 복원
                     cameraCapture.resetAutoFocus();
                     return true;
+                case ControlMessage.TYPE_INJECT_SCROLL_EVENT:
+                    // 카메라 모드에서 마우스 휠: 커서 위치 기준 줌인/줌아웃
+                    cameraCapture.zoomAt(msg.getPosition(), msg.getVScroll());
+                    return true;
+                case ControlMessage.TYPE_RESET_VIDEO:
+                    // 휠 클릭 / 초기화 시 줌 1.0x 리셋
+                    cameraCapture.resetZoom();
+                    return true;
+                case ControlMessage.TYPE_INJECT_TOUCH_EVENT:
+                    // 화면 터치 / 클릭 시 해당 영역 중심으로 포커스 맞춤 (Tap-to-Focus)
+                    if (msg.getAction() == android.view.MotionEvent.ACTION_DOWN) {
+                        cameraCapture.setFocusPoint(msg.getPosition());
+                    }
+                    return true;
                 default:
                     // fall through
             }
