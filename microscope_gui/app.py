@@ -123,7 +123,11 @@ class MicroscopeApp(ctk.CTk):
         self.zoom_hud = None
         self.current_zoom_level = 1.0
         self.hook_handle = None
-        self._install_mouse_hook()
+        import queue
+        from wheel_hook import WheelHook
+        self._hook_events = queue.Queue()
+        self._wheel_hook = WheelHook("Microscope Camera Stream", self.manager.is_running, self._hook_events, self._dbg)
+        self._wheel_hook.start()
         self.poll_click_feedback()
 
         # 설정값 로드
@@ -453,7 +457,25 @@ class MicroscopeApp(ctk.CTk):
         if attached:
             user32.AttachThreadInput(cur_tid, fg_tid, False)
 
+    def _drain_hook_events(self):
+        """훅 스레드가 넣은 휠/휠클릭 이벤트를 메인 스레드에서 처리"""
+        try:
+            handled = 0
+            while handled < 5:
+                kind, val = self._hook_events.get_nowait()
+                handled += 1
+                self._dbg(f"event {kind} {val}")
+                if kind == "wheel":
+                    self.handle_wheel_zoom(val)
+                else:
+                    self.send_scrcpy_reset_zoom()
+        except Exception as e:
+            if type(e).__name__ != "Empty":
+                self._dbg(f"drain error: {e!r}")
+
     def _dbg(self, msg):
+        """진단 로그 (기본 비활성). 필요하면 아래 return 을 제거하면 hook_debug.log 에 기록됨"""
+        return
         try:
             with open(os.path.join(BASE_DIR, "hook_debug.log"), "a", encoding="utf-8") as f:
                 f.write(msg + "\n")
@@ -630,13 +652,14 @@ class MicroscopeApp(ctk.CTk):
         except Exception:
             pass
 
+        self._drain_hook_events()
         self.after(20, self.poll_click_feedback)
 
     def sync_zoom_hud(self):
         """스트림 창의 위치를 추적하여 줌 HUD 슬라이더를 우측에 배치"""
         try:
             hwnd = ctypes.windll.user32.FindWindowW(None, "Microscope Camera Stream")
-            if hwnd and ctypes.windll.user32.IsWindowVisible(hwnd):
+            if hwnd and ctypes.windll.user32.IsWindowVisible(hwnd) and not ctypes.windll.user32.IsIconic(hwnd):
                 rect = wintypes.RECT()
                 ctypes.windll.user32.GetWindowRect(hwnd, ctypes.byref(rect))
 
@@ -699,6 +722,10 @@ class MicroscopeApp(ctk.CTk):
             except Exception:
                 pass
             self.hook_handle = None
+        try:
+            self._wheel_hook.stop()
+        except Exception:
+            pass
         super().destroy()
 
 
