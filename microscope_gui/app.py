@@ -4,6 +4,9 @@ CustomTkinter 기반 모던 UI
 """
 import os
 import sys
+import time
+import threading
+import subprocess
 import json
 import customtkinter as ctk
 import tkinter as tk
@@ -380,6 +383,7 @@ class MicroscopeApp(ctk.CTk):
         orientation = self.orientation_var.get()
         flip_v = self.flip_v_var.get()
         flip_h = self.flip_h_var.get()
+        self._stream_orient = (self.orientation_var.get(), flip_h, self.flip_v_var.get())
         res = self.res_combobox.get()
         size_arg = None if res == "최대(Max)" else res
         
@@ -456,6 +460,48 @@ class MicroscopeApp(ctk.CTk):
         user32.SetForegroundWindow(hwnd)
         if attached:
             user32.AttachThreadInput(cur_tid, fg_tid, False)
+
+    def send_focus_point(self, cx, cy, w, h):
+        """클릭 지점을 센서 프레임 비율로 변환해 adb로 서버에 전달 (카메라 모드에서는 클라이언트가 클릭을 전달하지 않음)"""
+        if w <= 0 or h <= 0:
+            return
+        u = max(0.0, min(1.0, cx / w))
+        v = max(0.0, min(1.0, cy / h))
+
+        # 표시 화면 → 프레임 좌표: 화면 = Rot(deg)(Flip_h(프레임)) 의 역변환
+        orientation, flip_h, flip_v = getattr(self, "_stream_orient", ("0", False, False))
+        deg = int(orientation) % 360
+        if flip_v:
+            deg = (deg + 180) % 360
+        flipped = bool(flip_h) ^ bool(flip_v)
+        if deg == 90:
+            x, y = v, 1.0 - u
+        elif deg == 180:
+            x, y = 1.0 - u, 1.0 - v
+        elif deg == 270:
+            x, y = 1.0 - v, u
+        else:
+            x, y = u, v
+        if flipped:
+            x = 1.0 - x
+
+        serial = self.device_combo.get()
+        if not serial or "연결된 기기 없음" in serial:
+            serial = None
+        cmd = [self.manager.adb_exe]
+        if serial:
+            cmd += ["-s", serial]
+        seq = int(time.time() * 1000)
+        cmd += ["shell", f"echo {seq} {x:.4f} {y:.4f} > /data/local/tmp/mic_focus.txt"]
+
+        def _run():
+            try:
+                subprocess.run(cmd, capture_output=True, timeout=5,
+                               creationflags=subprocess.CREATE_NO_WINDOW)
+            except Exception as e:
+                print(f"Focus send error: {e}")
+
+        threading.Thread(target=_run, daemon=True).start()
 
     def _drain_hook_events(self):
         """훅 스레드가 넣은 휠/휠클릭 이벤트를 메인 스레드에서 처리"""
@@ -644,6 +690,7 @@ class MicroscopeApp(ctk.CTk):
 
                             if 0 <= pt_client.x <= rect.right and 0 <= pt_client.y <= rect.bottom:
                                 self.trigger_focus_feedback(pt.x, pt.y)
+                                self.send_focus_point(pt_client.x, pt_client.y, rect.right, rect.bottom)
                 elif not is_pressed:
                     self.mouse_was_down = False
 

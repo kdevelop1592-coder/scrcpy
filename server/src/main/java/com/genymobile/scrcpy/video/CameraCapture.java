@@ -80,6 +80,8 @@ public class CameraCapture extends SurfaceCapture {
     private Float maxDigitalZoom;
     private float currentFocusDistance = 0.0f; // 0.0f = infinity (diopters)
     private float targetZoomLevel = 1.0f;
+    private Rect currentCrop; // 현재 적용된 크롭 영역 (null = 전체 센서)
+    private String lastFocusCmd;
     private float targetCenterXRatio = 0.5f;
     private float targetCenterYRatio = 0.5f;
 
@@ -342,6 +344,7 @@ public class CameraCapture extends SurfaceCapture {
                     CaptureRequest request = requestBuilder.build();
                     setRepeatingRequest(session, request);
                     currentSession = session;
+                    startFocusFilePoll();
                 } catch (CameraAccessException e) {
                     Ln.e("Camera error", e);
                     disconnected.set(true);
@@ -594,6 +597,7 @@ public class CameraCapture extends SurfaceCapture {
             // 1.0x 배율 복원: 전체 센서 영역으로 리셋
             try {
                 Ln.i("Reset zoom to 1.0x (full frame)");
+                currentCrop = null;
                 requestBuilder.set(CaptureRequest.SCALER_CROP_REGION, sensorRect);
                 CaptureRequest request = requestBuilder.build();
                 setRepeatingRequest(currentSession, request);
@@ -627,6 +631,7 @@ public class CameraCapture extends SurfaceCapture {
         }
 
         Rect cropRect = new Rect(cropLeft, cropTop, cropLeft + cropW, cropTop + cropH);
+        currentCrop = cropRect;
         try {
             Ln.i(String.format("Apply point-centered zoom: %.2fx at (%.2f, %.2f) -> crop: %s", targetZoomLevel, targetCenterXRatio, targetCenterYRatio, cropRect));
             requestBuilder.set(CaptureRequest.SCALER_CROP_REGION, cropRect);
@@ -764,6 +769,105 @@ public class CameraCapture extends SurfaceCapture {
                 }
             }
         });
+    }
+
+    private static final String FOCUS_FILE = "/data/local/tmp/mic_focus.txt";
+
+    private final Runnable focusPoller = new Runnable() {
+        @Override
+        public void run() {
+            if (!started || cameraHandler == null) {
+                return;
+            }
+            try {
+                String cmd = readFocusFile();
+                if (cmd != null && !cmd.equals(lastFocusCmd)) {
+                    boolean first = lastFocusCmd == null;
+                    lastFocusCmd = cmd;
+                    if (!first) {
+                        // 형식: "seq rx ry" (rx, ry: 표시 화면 기준 0~1 비율)
+                        String[] p = cmd.split("\\s+");
+                        if (p.length >= 3) {
+                            focusAtRatio(Float.parseFloat(p[1]), Float.parseFloat(p[2]));
+                        }
+                    }
+                } else if (lastFocusCmd == null) {
+                    lastFocusCmd = "";
+                }
+            } catch (Exception e) {
+                Ln.w("Focus poll error: " + e);
+            }
+            cameraHandler.postDelayed(this, 80);
+        }
+    };
+
+    private static String readFocusFile() {
+        java.io.File f = new java.io.File(FOCUS_FILE);
+        if (!f.exists()) {
+            return null;
+        }
+        try (java.io.BufferedReader r = new java.io.BufferedReader(new java.io.FileReader(f))) {
+            String line = r.readLine();
+            return line != null ? line.trim() : null;
+        } catch (IOException e) {
+            return null;
+        }
+    }
+
+    /** 클라이언트가 카메라 모드에서 마우스 클릭을 전달하지 않으므로, 파일 기반으로 탭 포커스 좌표를 받는다. */
+    private void startFocusFilePoll() {
+        lastFocusCmd = readFocusFile(); // 이전 실행의 오래된 좌표는 무시
+        if (lastFocusCmd == null) {
+            lastFocusCmd = "";
+        }
+        cameraHandler.postDelayed(focusPoller, 80);
+    }
+
+    /** 표시 화면(현재 줌 크롭 영역 기준) 비율 좌표를 센서 좌표로 변환하여 원샷 AF 수행 (카메라 스레드에서 호출) */
+    private void focusAtRatio(float rx, float ry) {
+        assertCameraThread();
+        if (currentSession == null || requestBuilder == null) {
+            return;
+        }
+        try {
+            rx = Math.max(0f, Math.min(1f, rx));
+            ry = Math.max(0f, Math.min(1f, ry));
+
+            Rect sensorRect = activeArraySize;
+            if (sensorRect == null) {
+                sensorRect = new Rect(0, 0, captureSize.getWidth(), captureSize.getHeight());
+            }
+            Rect view = currentCrop != null ? currentCrop : sensorRect;
+
+            int centerX = view.left + (int) (rx * view.width());
+            int centerY = view.top + (int) (ry * view.height());
+
+            int boxHalfW = Math.max(20, view.width() / 12);
+            int boxHalfH = Math.max(20, view.height() / 12);
+
+            Rect focusRect = new Rect(
+                    Math.max(sensorRect.left, centerX - boxHalfW),
+                    Math.max(sensorRect.top, centerY - boxHalfH),
+                    Math.min(sensorRect.right, centerX + boxHalfW),
+                    Math.min(sensorRect.bottom, centerY + boxHalfH));
+            MeteringRectangle[] regions = new MeteringRectangle[]{new MeteringRectangle(focusRect, MeteringRectangle.METERING_WEIGHT_MAX)};
+
+            Ln.i(String.format("Tap-to-Focus at ratio (%.3f, %.3f) -> region: %s", rx, ry, focusRect));
+
+            requestBuilder.set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_AUTO);
+            requestBuilder.set(CaptureRequest.CONTROL_AF_TRIGGER, CaptureRequest.CONTROL_AF_TRIGGER_CANCEL);
+            requestBuilder.set(CaptureRequest.CONTROL_AF_REGIONS, regions);
+            requestBuilder.set(CaptureRequest.CONTROL_AE_REGIONS, regions);
+            currentSession.capture(requestBuilder.build(), null, cameraHandler);
+
+            requestBuilder.set(CaptureRequest.CONTROL_AF_TRIGGER, CaptureRequest.CONTROL_AF_TRIGGER_START);
+            currentSession.capture(requestBuilder.build(), null, cameraHandler);
+
+            requestBuilder.set(CaptureRequest.CONTROL_AF_TRIGGER, CaptureRequest.CONTROL_AF_TRIGGER_IDLE);
+            setRepeatingRequest(currentSession, requestBuilder.build());
+        } catch (CameraAccessException e) {
+            Ln.e("Camera tap-to-focus error", e);
+        }
     }
 
     private void assertCameraThread() {
