@@ -1,0 +1,19 @@
+Modifications to scrcpy (Apache License 2.0, section 4(b))
+===========================================================
+Upstream: https://github.com/Genymobile/scrcpy  (base version: v3.x series, packaged as v5.0.1 in this tree)
+
+The bundled "scrcpy-server" was rebuilt from modified sources. The scrcpy client
+(scrcpy.exe) is unmodified in source.
+
+Modified files:
+1. server/src/main/java/com/genymobile/scrcpy/video/CameraCapture.java
+   - Added crop-based digital zoom (SCALER_CROP_REGION) with optional focus center.
+   - zoomIn()/zoomOut() now use crop zoom (works on devices without CONTROL_ZOOM_RATIO).
+   - Added manual focus distance adjustment, auto-focus reset and tap-to-focus (AF regions).
+   - Added a file-based tap-to-focus channel: polls /data/local/tmp/mic_focus.txt
+     ("seq rx ry"), converting display ratios through the current zoom crop.
+2. server/src/main/java/com/genymobile/scrcpy/control/Controller.java
+   - Camera-mode handling for focus / zoom / reset control messages.
+
+The microscope_gui application (Python) is a separate program that launches scrcpy
+as an external process and is not derived from scrcpy source code.

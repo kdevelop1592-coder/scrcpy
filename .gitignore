@@ -7,4 +7,9 @@ build/
 .gradle/
 /x/
 local.properties
+__pycache__/
+*.pyc
+microscope_gui/hook_debug.log
+distribution/output/
+distribution/build/
 /scrcpy-server

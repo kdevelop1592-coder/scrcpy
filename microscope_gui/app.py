@@ -1,3 +1,4 @@
+import webbrowser
 """
 대물렌즈 / 현미경 전용 scrcpy 제어 GUI 프로그램
 CustomTkinter 기반 모던 UI
@@ -20,11 +21,27 @@ ctk.set_appearance_mode("Dark")
 ctk.set_default_color_theme("blue")
 
 # 기본 scrcpy 경로 (v5.0.1 폴더 탐색)
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+APP_NAME = "MicroscopeController"
+APP_VERSION = "1.00"
+FROZEN = getattr(sys, "frozen", False)
+
+# exe로 배포된 경우 exe 위치를, 개발 중에는 소스 위치를 기준 경로로 사용
+BASE_DIR = os.path.dirname(sys.executable) if FROZEN else os.path.dirname(os.path.abspath(__file__))
 DEFAULT_SCRCPY_DIR = os.path.abspath(
     os.path.join(BASE_DIR, "..", "release", "scrcpy-win64-v5.0.1", "scrcpy-win64-v5.0.1")
 )
-CONFIG_FILE = os.path.join(BASE_DIR, "microscope_config.json")
+# 배포본: <exe 폴더>/scrcpy 를 우선 사용, 없으면 개발용 경로 사용
+_BUNDLED_SCRCPY_DIR = os.path.join(BASE_DIR, "scrcpy")
+if os.path.exists(os.path.join(_BUNDLED_SCRCPY_DIR, "scrcpy.exe")):
+    DEFAULT_SCRCPY_DIR = _BUNDLED_SCRCPY_DIR
+
+# 배포본은 설치 폴더(Program Files)에 쓰기 권한이 없으므로 %APPDATA%에 설정 저장
+if FROZEN:
+    _CONFIG_DIR = os.path.join(os.environ.get("APPDATA", BASE_DIR), APP_NAME)
+    os.makedirs(_CONFIG_DIR, exist_ok=True)
+else:
+    _CONFIG_DIR = BASE_DIR
+CONFIG_FILE = os.path.join(_CONFIG_DIR, "microscope_config.json")
 
 
 class ZoomHUD(tk.Toplevel):
@@ -196,7 +213,9 @@ class MicroscopeApp(ctk.CTk):
         self.device_combo.grid(row=0, column=1, padx=10, pady=10, sticky="w")
 
         refresh_btn = ctk.CTkButton(dev_frame, text="🔄 새로고침", width=90, command=self.refresh_devices)
-        refresh_btn.grid(row=0, column=2, padx=10, pady=10)
+        refresh_btn.grid(row=0, column=2, padx=(10, 5), pady=10)
+        guide_btn = ctk.CTkButton(dev_frame, text="❓ 연결 가이드", width=110, fg_color="#1F6FEB", hover_color="#1158C7", command=self.show_connection_guide)
+        guide_btn.grid(row=0, column=3, padx=(5, 10), pady=10)
 
         # 2. 광학 및 렌즈 설정 (회전 / 반전 / 카메라 선택)
         lens_frame = ctk.CTkFrame(self, corner_radius=10)
@@ -347,11 +366,66 @@ class MicroscopeApp(ctk.CTk):
         # 5. 상태 / 로그 텍스트 박스
         self.log_box = ctk.CTkTextbox(self, height=120, font=ctk.CTkFont(family="Consolas", size=11))
         self.log_box.pack(fill="both", expand=True, padx=15, pady=(5, 15))
-        self.log("프로그램이 준비되었습니다.")
+        self.log(f"프로그램이 준비되었습니다. (v{APP_VERSION})")
+        if not os.path.exists(self.manager.scrcpy_exe):
+            self.log(f"[경고] scrcpy.exe를 찾을 수 없습니다: {self.manager.scrcpy_exe}")
 
     def log(self, message: str):
         self.log_box.insert("end", f"> {message}\n")
         self.log_box.see("end")
+
+
+    def show_connection_guide(self):
+        """스마트폰 연결 및 개발자 모드 / USB 드라이버 가이드 팝업 창"""
+        win = ctk.CTkToplevel(self)
+        win.title("스마트폰(대물렌즈) 연결 가이드")
+        win.geometry("580x530")
+        win.resizable(False, False)
+        win.attributes("-topmost", True)
+        win.after(100, win.lift)
+
+        title = ctk.CTkLabel(win, text="📱 스마트폰 연결 가이드 (필독)", font=ctk.CTkFont(size=18, weight="bold"), text_color="#58A6FF")
+        title.pack(pady=(16, 8))
+
+        guide_box = ctk.CTkTextbox(win, width=530, height=370, font=ctk.CTkFont(family="Consolas", size=12))
+        guide_box.pack(padx=20, pady=5)
+
+        guide_text = (
+            "===========================================================\n"
+            " 본 프로그램은 안드로이드 스마트폰 전용입니다 (아이폰 불가)\n"
+            "===========================================================\n\n"
+            "[1. 스마트폰 개발자 모드 및 USB 디버깅 켜기]\n"
+            " 1) 스마트폰 [설정] > [휴대전화 정보] (또는 소프트웨어 정보)\n"
+            " 2) [빌드 번호] 항목을 빠르게 7번 터치 (개발자 모드 활성화)\n"
+            " 3) 뒤로 가서 [설정] > [개발자 옵션] 진입\n"
+            " 4) [USB 디버깅] 스위치를 켭니다 (ON)\n"
+            " 5) PC에 USB 연결 시 폰 화면에 뜨는\n"
+            "    [이 컴퓨터에서 항상 허용] 팝업을 반드시 체크하고 [허용] 누름\n\n"
+            "[2. 스마트폰 제조사 PC USB 드라이버 필수 설치]\n"
+            " PC가 스마트폰을 ADB 장치로 인식하려면 전용 드라이버가 필요합니다.\n"
+            " (드라이버가 없으면 '연결된 기기 없음'으로 뜸)\n\n"
+            "  * LG V50 등 LG 스마트폰:\n"
+            "    https://www.lge.co.kr/support/mobile-driver-download\n\n"
+            "  * 삼성 갤럭시 스마트폰:\n"
+            "    https://www.samsung.com/sec/support/usb/\n\n"
+            "  설치 후 USB 케이블을 다시 꽂고 [새로고침]을 누르세요.\n"
+        )
+        guide_box.insert("end", guide_text)
+        guide_box.configure(state="disabled")
+
+        btn_row = ctk.CTkFrame(win, fg_color="transparent")
+        btn_row.pack(fill="x", padx=20, pady=10)
+
+        lg_btn = ctk.CTkButton(btn_row, text="🌐 LG 드라이버 다운로드", width=160, fg_color="#C93B2B", hover_color="#A82B1D",
+                               command=lambda: webbrowser.open("https://www.lge.co.kr/support/mobile-driver-download"))
+        lg_btn.pack(side="left", padx=5)
+
+        sam_btn = ctk.CTkButton(btn_row, text="🌐 삼성 드라이버 다운로드", width=160,
+                                command=lambda: webbrowser.open("https://www.samsung.com/sec/support/usb/"))
+        sam_btn.pack(side="left", padx=5)
+
+        close_btn = ctk.CTkButton(btn_row, text="닫기", width=90, fg_color="#30363D", hover_color="#484F58", command=win.destroy)
+        close_btn.pack(side="right", padx=5)
 
     def refresh_devices(self):
         devices = self.manager.get_devices()

@@ -120,13 +120,20 @@ class ScrcpyManager:
                 cwd=self.scrcpy_dir,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
+                creationflags=subprocess.CREATE_NO_WINDOW if sys.platform == "win32" else 0,
                 text=True
             )
 
+            proc = self.process
+
             def _watch():
-                stdout, stderr = self.process.communicate()
-                code = self.process.returncode
-                self.process = None
+                try:
+                    stdout, stderr = proc.communicate()
+                    code = proc.returncode
+                except Exception:
+                    code = -1
+                if self.process is proc:
+                    self.process = None
                 if on_exit_callback:
                     on_exit_callback(code)
 
