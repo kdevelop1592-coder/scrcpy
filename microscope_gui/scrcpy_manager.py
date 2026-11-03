@@ -71,11 +71,12 @@ class ScrcpyManager:
         stay_awake: bool = True,
         device_serial: Optional[str] = None,
         custom_args: Optional[List[str]] = None,
-        on_exit_callback: Optional[Callable[[int], None]] = None
+        on_exit_callback: Optional[Callable[[int], None]] = None,
+        on_log_callback: Optional[Callable[[str], None]] = None
     ) -> bool:
         """대물렌즈 모니터링 실행"""
         if self.is_running():
-            return False
+            self.stop()
 
         # 회전 및 반전 처리
         # scrcpy capture-orientation은 0, 90, 180, 270 또는 flip0, flip90, flip180, flip270 (수평 반전 + 회전)
@@ -119,16 +120,24 @@ class ScrcpyManager:
                 cmd,
                 cwd=self.scrcpy_dir,
                 stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
                 creationflags=subprocess.CREATE_NO_WINDOW if sys.platform == "win32" else 0,
-                text=True
+                text=True,
+                encoding="utf-8",
+                errors="replace"
             )
 
             proc = self.process
 
             def _watch():
                 try:
-                    stdout, stderr = proc.communicate()
+                    for line in iter(proc.stdout.readline, ''):
+                        if line:
+                            text = line.rstrip()
+                            if on_log_callback:
+                                on_log_callback(text)
+                    proc.stdout.close()
+                    proc.wait()
                     code = proc.returncode
                 except Exception:
                     code = -1
@@ -145,16 +154,29 @@ class ScrcpyManager:
             return False
 
     def stop(self):
-        """실행 중인 scrcpy 종료"""
+        """실행 중인 scrcpy 종료 및 정리"""
         if self.process:
             try:
                 self.process.terminate()
+                self.process.wait(timeout=1)
             except Exception:
                 try:
                     self.process.kill()
                 except Exception:
                     pass
             self.process = None
+
+        # 남은 좀비 scrcpy 프로세스가 있다면 정리
+        if sys.platform == "win32":
+            try:
+                subprocess.run(
+                    ["taskkill", "/F", "/IM", "scrcpy.exe"],
+                    stdout=subprocess.DEVNULL,
+                    stderr=subprocess.DEVNULL,
+                    creationflags=subprocess.CREATE_NO_WINDOW
+                )
+            except Exception:
+                pass
 
     def is_running(self) -> bool:
         return self.process is not None and self.process.poll() is None

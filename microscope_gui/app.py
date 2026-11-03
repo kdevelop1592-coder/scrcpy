@@ -372,6 +372,10 @@ class MicroscopeApp(ctk.CTk):
 
     def log(self, message: str):
         self.log_box.insert("end", f"> {message}\n")
+        # 로그가 너무 길어지면 오래된 줄을 삭제하여 UI 멈춤 방지 (최대 300줄 유지)
+        line_count = int(float(self.log_box.index("end-1c").split(".")[0]))
+        if line_count > 300:
+            self.log_box.delete("1.0", f"{line_count - 300}.0")
         self.log_box.see("end")
 
 
@@ -480,6 +484,9 @@ class MicroscopeApp(ctk.CTk):
         def on_exit(code):
             self.after(0, self.on_process_exit, code)
 
+        def on_scrcpy_log(line):
+            self.after(0, self._on_scrcpy_output, line)
+
         success = self.manager.start_microscope(
             camera_id=cam_id,
             orientation=orientation,
@@ -490,7 +497,8 @@ class MicroscopeApp(ctk.CTk):
             no_audio=True,
             stay_awake=self.stay_awake_var.get(),
             device_serial=serial,
-            on_exit_callback=on_exit
+            on_exit_callback=on_exit,
+            on_log_callback=on_scrcpy_log
         )
 
         if success:
@@ -722,7 +730,33 @@ class MicroscopeApp(ctk.CTk):
         self.stop_btn.configure(state="disabled")
         self.log("스트림이 중지되었습니다.")
 
+    def _on_scrcpy_output(self, line: str):
+        s = line.strip()
+        if not s:
+            return
+        # 정상 스트리밍 중에는 scrcpy가 불필요한 로그를 쏟아내지 않으나,
+        # 중요 안내/경고/에러 또는 크래시 관련 로그만 UI 및 파일에 기록하여 로그 폭탄 방지
+        self.log(f"[scrcpy] {s}")
+        self._write_crash_log(f"[scrcpy] {s}")
+
+    def _write_crash_log(self, text: str):
+        try:
+            log_path = os.path.join(BASE_DIR, "microscope_debug.log")
+            # 로그 파일이 2MB를 넘으면 자동으로 회전(정리)하여 용량 무한 증식 방지
+            if os.path.exists(log_path) and os.path.getsize(log_path) > 2 * 1024 * 1024:
+                old_log = log_path + ".old"
+                if os.path.exists(old_log):
+                    os.remove(old_log)
+                os.rename(log_path, old_log)
+
+            ts = time.strftime("%Y-%m-%d %H:%M:%S")
+            with open(log_path, "a", encoding="utf-8") as f:
+                f.write(f"[{ts}] {text}\n")
+        except Exception:
+            pass
+
     def on_process_exit(self, code):
+        self._write_crash_log(f"Process exited with code {code}")
         if self.zoom_hud:
             try:
                 self.zoom_hud.destroy()
