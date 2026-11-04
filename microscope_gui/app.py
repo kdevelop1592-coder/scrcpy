@@ -143,6 +143,8 @@ class MicroscopeApp(ctk.CTk):
         self.zoom_hud = None
         self.current_zoom_level = 1.0
         self.hook_handle = None
+        self._user_stopped = False
+        self._reconnecting = False
         import queue
         from wheel_hook import WheelHook
         self._hook_events = queue.Queue()
@@ -165,7 +167,9 @@ class MicroscopeApp(ctk.CTk):
             "flip_h": False,
             "resolution": "1920x1080",
             "fps": "30",
-            "stay_awake": True
+            "stay_awake": True,
+            "turn_screen_off": True,
+            "auto_reconnect": True
         }
         if os.path.exists(CONFIG_FILE):
             try:
@@ -184,7 +188,9 @@ class MicroscopeApp(ctk.CTk):
             "flip_h": self.flip_h_var.get(),
             "resolution": self.res_combobox.get(),
             "fps": self.fps_combobox.get(),
-            "stay_awake": self.stay_awake_var.get()
+            "stay_awake": self.stay_awake_var.get(),
+            "turn_screen_off": self.turn_screen_off_var.get(),
+            "auto_reconnect": self.auto_reconnect_var.get()
         }
         try:
             with open(CONFIG_FILE, "w", encoding="utf-8") as f:
@@ -272,13 +278,18 @@ class MicroscopeApp(ctk.CTk):
         self.fps_combobox.set(self.config.get("fps", "30"))
         self.fps_combobox.grid(row=1, column=3, padx=10, pady=5, sticky="w")
 
-        # 편의 옵션
+        # 편의 및 발열 방지 옵션
         self.stay_awake_var = ctk.BooleanVar(value=self.config.get("stay_awake", True))
-        self.stay_awake_cb = ctk.CTkCheckBox(vid_frame, text="절전 모드 방지 (Stay Awake)", variable=self.stay_awake_var)
-        self.stay_awake_cb.grid(row=2, column=0, columnspan=2, padx=10, pady=8, sticky="w")
+        self.stay_awake_cb = ctk.CTkCheckBox(vid_frame, text="절전 방지(Stay Awake)", variable=self.stay_awake_var)
+        self.stay_awake_cb.grid(row=2, column=0, padx=10, pady=8, sticky="w")
 
-        tip_lbl = ctk.CTkLabel(vid_frame, text="💡 카메라 스트림 중 단축키 Mod(Alt)+O 로 폰 화면을 끌 수 있습니다.", font=ctk.CTkFont(size=11), text_color="#8B949E")
-        tip_lbl.grid(row=2, column=2, columnspan=2, padx=10, pady=8, sticky="w")
+        self.turn_screen_off_var = ctk.BooleanVar(value=self.config.get("turn_screen_off", True))
+        self.turn_screen_off_cb = ctk.CTkCheckBox(vid_frame, text="폰 화면 끄기(발열 감소)", variable=self.turn_screen_off_var)
+        self.turn_screen_off_cb.grid(row=2, column=1, padx=10, pady=8, sticky="w")
+
+        self.auto_reconnect_var = ctk.BooleanVar(value=self.config.get("auto_reconnect", True))
+        self.auto_reconnect_cb = ctk.CTkCheckBox(vid_frame, text="연결 끊김 시 자동 재연결", variable=self.auto_reconnect_var)
+        self.auto_reconnect_cb.grid(row=2, column=2, columnspan=2, padx=10, pady=8, sticky="w")
 
         # 4. 실시간 관찰 단축키 가이드 섹션
         shortcut_frame = ctk.CTkFrame(self, corner_radius=10)
@@ -456,6 +467,8 @@ class MicroscopeApp(ctk.CTk):
             self.stop_stream()
             return
 
+        self._user_stopped = False
+        self._reconnecting = False
         self.save_config()
         cam_id = self.camera_id_entry.get().strip() or "0"
         orientation = self.orientation_var.get()
@@ -494,6 +507,8 @@ class MicroscopeApp(ctk.CTk):
             flip_vertical=flip_v,
             camera_size=size_arg,
             camera_fps=fps_val,
+            video_bit_rate="12M",
+            turn_screen_off=self.turn_screen_off_var.get(),
             no_audio=True,
             stay_awake=self.stay_awake_var.get(),
             device_serial=serial,
@@ -719,6 +734,8 @@ class MicroscopeApp(ctk.CTk):
         )
 
     def stop_stream(self):
+        self._user_stopped = True
+        self._reconnecting = False
         if self.zoom_hud:
             try:
                 self.zoom_hud.destroy()
@@ -763,9 +780,55 @@ class MicroscopeApp(ctk.CTk):
             except Exception:
                 pass
             self.zoom_hud = None
-        self.start_btn.configure(text="🔬 대물렌즈 모니터링 시작", state="normal", fg_color="#2EA043")
-        self.stop_btn.configure(state="disabled")
-        self.log(f"scrcpy 프로세스가 종료되었습니다 (종료 코드: {code}).")
+
+        if self._user_stopped:
+            self.start_btn.configure(text="🔬 대물렌즈 모니터링 시작", state="normal", fg_color="#2EA043")
+            self.stop_btn.configure(state="disabled")
+            self.log(f"scrcpy 프로세스가 정상 종료되었습니다 (종료 코드: {code}).")
+            return
+
+        # 사용자가 중지 버튼을 누르지 않았는데 비정상 종료된 경우 (크래시 / 연결 끊김)
+        if self.auto_reconnect_var.get() and not self._reconnecting:
+            self._trigger_auto_reconnect()
+        else:
+            self.start_btn.configure(text="🔬 대물렌즈 모니터링 시작", state="normal", fg_color="#2EA043")
+            self.stop_btn.configure(state="disabled")
+            self.log(f"scrcpy 프로세스가 비정상 종료되었습니다 (종료 코드: {code}).")
+
+    def _trigger_auto_reconnect(self):
+        """연결 끊김 시 기기 재인식 및 자동 재연결 시도 스레드"""
+        self._reconnecting = True
+        self.start_btn.configure(text="🔄 기기 재연결 대기 중...", state="disabled", fg_color="#D97706")
+        self.stop_btn.configure(state="normal")
+        self.log("⚠️ 연결이 끊어졌습니다. 스마트폰 재연결을 감지하는 즉시 복구합니다...")
+
+        def _reconnect_worker():
+            retry_count = 0
+            max_retries = 30  # 최대 약 60초 대기
+            while retry_count < max_retries and self._reconnecting and not self._user_stopped:
+                time.sleep(2)
+                devices = self.manager.get_devices()
+                target_serial = self.device_combo.get()
+                if "연결된 기기 없음" in target_serial or not target_serial:
+                    target_serial = devices[0] if devices else None
+
+                if devices and (target_serial is None or target_serial in devices):
+                    self.log(f"✅ 기기 연결 감지 ({target_serial or devices[0]}). 스트림을 자동 재시작합니다.")
+                    self._reconnecting = False
+                    self.after(500, self.toggle_stream)
+                    return
+                retry_count += 1
+
+            self._reconnecting = False
+            self.after(0, lambda: self._on_reconnect_failed())
+
+        threading.Thread(target=_reconnect_worker, daemon=True).start()
+
+    def _on_reconnect_failed(self):
+        if not self._user_stopped:
+            self.start_btn.configure(text="🔬 대물렌즈 모니터링 시작", state="normal", fg_color="#2EA043")
+            self.stop_btn.configure(state="disabled")
+            self.log("❌ 재연결 대기 시간 초과. USB 연결 상태를 확인한 후 다시 시작해 주세요.")
 
     def poll_click_feedback(self):
         """오직 scrcpy 카메라 스트림 화면(내부)을 클릭했을 때만 포커스 HUD 및 커서 피드백 제공"""

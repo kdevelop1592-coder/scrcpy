@@ -59,6 +59,26 @@ class ScrcpyManager:
         except Exception as e:
             return [f"Error listing cameras: {e}"]
 
+    def cleanup_device_server(self, device_serial: Optional[str] = None):
+        """기기(Android)에 남아 있는 scrcpy-server 잔여 프로세스 및 포트 정리"""
+        if not os.path.exists(self.adb_exe):
+            return
+        base_cmd = [self.adb_exe]
+        if device_serial:
+            base_cmd.extend(["-s", device_serial])
+
+        try:
+            # 1. scrcpy-server 프로세스 강제 종료
+            pkill_cmd = base_cmd + ["shell", "pkill -f app_process.*scrcpy || killall scrcpy-server || true"]
+            subprocess.run(
+                pkill_cmd,
+                capture_output=True,
+                timeout=2,
+                creationflags=subprocess.CREATE_NO_WINDOW if sys.platform == "win32" else 0
+            )
+        except Exception:
+            pass
+
     def start_microscope(
         self,
         camera_id: str = "0",
@@ -67,6 +87,8 @@ class ScrcpyManager:
         flip_vertical: bool = False,
         camera_size: Optional[str] = None,
         camera_fps: Optional[int] = 30,
+        video_bit_rate: Optional[str] = "12M",
+        turn_screen_off: bool = False,
         no_audio: bool = True,
         stay_awake: bool = True,
         device_serial: Optional[str] = None,
@@ -76,7 +98,9 @@ class ScrcpyManager:
     ) -> bool:
         """대물렌즈 모니터링 실행"""
         if self.is_running():
-            self.stop()
+            self.stop(device_serial=device_serial)
+        else:
+            self.cleanup_device_server(device_serial=device_serial)
 
         # 회전 및 반전 처리
         # scrcpy capture-orientation은 0, 90, 180, 270 또는 flip0, flip90, flip180, flip270 (수평 반전 + 회전)
@@ -108,6 +132,10 @@ class ScrcpyManager:
             cmd.append(f"--camera-size={camera_size}")
         if camera_fps and camera_fps > 0:
             cmd.append(f"--camera-fps={camera_fps}")
+        if video_bit_rate:
+            cmd.append(f"--video-bit-rate={video_bit_rate}")
+        if turn_screen_off:
+            cmd.append("--turn-screen-off")
         if stay_awake:
             cmd.append("--stay-awake")
         if device_serial:
@@ -143,6 +171,7 @@ class ScrcpyManager:
                     code = -1
                 if self.process is proc:
                     self.process = None
+                self.cleanup_device_server(device_serial=device_serial)
                 if on_exit_callback:
                     on_exit_callback(code)
 
@@ -153,7 +182,7 @@ class ScrcpyManager:
             print(f"Failed to start scrcpy: {e}")
             return False
 
-    def stop(self):
+    def stop(self, device_serial: Optional[str] = None):
         """실행 중인 scrcpy 종료 및 정리"""
         if self.process:
             try:
@@ -165,6 +194,9 @@ class ScrcpyManager:
                 except Exception:
                     pass
             self.process = None
+
+        # 기기 내부의 scrcpy-server 데몬도 함께 강제 정리
+        self.cleanup_device_server(device_serial=device_serial)
 
         # 남은 좀비 scrcpy 프로세스가 있다면 정리
         if sys.platform == "win32":

@@ -5,5 +5,7 @@
     "flip_h": true,
     "resolution": "1920x1080",
     "fps": "60",
-    "stay_awake": true
+    "stay_awake": true,
+    "turn_screen_off": true,
+    "auto_reconnect": true
 }
