@@ -145,6 +145,7 @@ class MicroscopeApp(ctk.CTk):
         self.hook_handle = None
         self._user_stopped = False
         self._reconnecting = False
+        self._reconnect_timer_id = None
         import queue
         from wheel_hook import WheelHook
         self._hook_events = queue.Queue()
@@ -736,6 +737,12 @@ class MicroscopeApp(ctk.CTk):
     def stop_stream(self):
         self._user_stopped = True
         self._reconnecting = False
+        if self._reconnect_timer_id is not None:
+            try:
+                self.after_cancel(self._reconnect_timer_id)
+            except Exception:
+                pass
+            self._reconnect_timer_id = None
         if self.zoom_hud:
             try:
                 self.zoom_hud.destroy()
@@ -788,7 +795,7 @@ class MicroscopeApp(ctk.CTk):
             return
 
         # 사용자가 중지 버튼을 누르지 않았는데 비정상 종료된 경우 (크래시 / 연결 끊김)
-        if self.auto_reconnect_var.get() and not self._reconnecting:
+        if self.auto_reconnect_var.get() and not self._reconnecting and not self._user_stopped:
             self._trigger_auto_reconnect()
         else:
             self.start_btn.configure(text="🔬 대물렌즈 모니터링 시작", state="normal", fg_color="#2EA043")
@@ -797,6 +804,8 @@ class MicroscopeApp(ctk.CTk):
 
     def _trigger_auto_reconnect(self):
         """연결 끊김 시 기기 재인식 및 자동 재연결 시도 스레드"""
+        if self._user_stopped:
+            return
         self._reconnecting = True
         self.start_btn.configure(text="🔄 기기 재연결 대기 중...", state="disabled", fg_color="#D97706")
         self.stop_btn.configure(state="normal")
@@ -807,15 +816,23 @@ class MicroscopeApp(ctk.CTk):
             max_retries = 30  # 최대 약 60초 대기
             while retry_count < max_retries and self._reconnecting and not self._user_stopped:
                 time.sleep(2)
+                if not self._reconnecting or self._user_stopped:
+                    break
                 devices = self.manager.get_devices()
                 target_serial = self.device_combo.get()
                 if "연결된 기기 없음" in target_serial or not target_serial:
                     target_serial = devices[0] if devices else None
 
                 if devices and (target_serial is None or target_serial in devices):
+                    if not self._reconnecting or self._user_stopped:
+                        break
                     self.log(f"✅ 기기 연결 감지 ({target_serial or devices[0]}). 스트림을 자동 재시작합니다.")
                     self._reconnecting = False
-                    self.after(500, self.toggle_stream)
+                    def _do_restart():
+                        self._reconnect_timer_id = None
+                        if not self._user_stopped:
+                            self.toggle_stream()
+                    self._reconnect_timer_id = self.after(500, _do_restart)
                     return
                 retry_count += 1
 

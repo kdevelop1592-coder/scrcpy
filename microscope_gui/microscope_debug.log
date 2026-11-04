@@ -742,3 +742,327 @@
 [2026-11-04 14:45:51] [scrcpy] [server] INFO: Using camera '0'
 [2026-11-04 14:45:51] [scrcpy] [server] INFO: Camera characteristics - focusDist: 10.0, activeArray: Rect(0, 0 - 4080, 3060), maxDigitalZoom: 8.0
 [2026-11-04 14:45:51] [scrcpy] INFO: Texture (D3D11VA): 1920x1088
+[2026-11-04 14:48:21] [scrcpy] scrcpy 5.0.1 <https://github.com/Genymobile/scrcpy>
+[2026-11-04 14:48:21] [scrcpy] INFO: ADB device found:
+[2026-11-04 14:48:21] [scrcpy] INFO:     -->   (usb)  R3CW20AT3VY                     device  SM_S918N
+[2026-11-04 14:48:21] [scrcpy] D:\project\scrcpy\release\scrcpy-win64-v5.0.1\scrcpy-win64-v5.0.1\scrcpy-server: 1 file pushed, 0 skipped. 37.4 MB/s (737902 bytes in 0.019s)
+[2026-11-04 14:48:21] [scrcpy] [server] INFO: Device: [samsung] samsung SM-S918N (Android 16)
+[2026-11-04 14:48:21] [scrcpy] INFO: Renderer: direct3d11
+[2026-11-04 14:48:21] [scrcpy] INFO: Interop: d3d11va
+[2026-11-04 14:48:21] [scrcpy] INFO: Video decoding: d3d11va
+[2026-11-04 14:48:21] [scrcpy] ERROR: Demuxer 'video': stream disabled due to connection error
+[2026-11-04 14:48:21] [scrcpy] ERROR: Demuxer error
+[2026-11-04 14:48:21] [scrcpy] [server] ERROR: Exception on thread Thread[control-recv,5,main]
+[2026-11-04 14:48:21] [scrcpy] java.lang.NullPointerException: Attempt to invoke virtual method 'boolean android.os.Handler.post(java.lang.Runnable)' on a null object reference
+[2026-11-04 14:48:21] [scrcpy] at com.genymobile.scrcpy.video.CameraCapture.adjustFocus(CameraCapture.java:663)
+[2026-11-04 14:48:21] [scrcpy] at com.genymobile.scrcpy.control.Controller.handleEvent(Controller.java:437)
+[2026-11-04 14:48:21] [scrcpy] at com.genymobile.scrcpy.control.Controller.control(Controller.java:246)
+[2026-11-04 14:48:21] [scrcpy] at com.genymobile.scrcpy.control.Controller.lambda$start$2$com-genymobile-scrcpy-control-Controller(Controller.java:281)
+[2026-11-04 14:48:21] [scrcpy] at com.genymobile.scrcpy.control.Controller$$ExternalSyntheticLambda1.run(D8$$SyntheticClass:0)
+[2026-11-04 14:48:21] [scrcpy] at java.lang.Thread.run(Thread.java:1571)
+[2026-11-04 14:48:21] [scrcpy] Killed
+[2026-11-04 14:48:21] Process exited with code 1
+[2026-11-04 14:48:24] [scrcpy] scrcpy 5.0.1 <https://github.com/Genymobile/scrcpy>
+[2026-11-04 14:48:24] [scrcpy] INFO: ADB device found:
+[2026-11-04 14:48:24] [scrcpy] INFO:     -->   (usb)  R3CW20AT3VY                     device  SM_S918N
+[2026-11-04 14:48:24] [scrcpy] D:\project\scrcpy\release\scrcpy-win64-v5.0.1\scrcpy-win64-v5.0.1\scrcpy-server: 1 file pushed, 0 skipped. 38.2 MB/s (737902 bytes in 0.018s)
+[2026-11-04 14:48:25] [scrcpy] [server] INFO: Device: [samsung] samsung SM-S918N (Android 16)
+[2026-11-04 14:48:25] [scrcpy] INFO: Renderer: direct3d11
+[2026-11-04 14:48:25] [scrcpy] INFO: Interop: d3d11va
+[2026-11-04 14:48:25] [scrcpy] INFO: Video decoding: d3d11va
+[2026-11-04 14:48:25] [scrcpy] ERROR: Demuxer 'video': stream disabled due to connection error
+[2026-11-04 14:48:25] [scrcpy] WARN: Device disconnected
+[2026-11-04 14:48:25] [scrcpy] [server] ERROR: Exception on thread Thread[control-recv,5,main]
+[2026-11-04 14:48:25] [scrcpy] java.lang.NullPointerException: Attempt to invoke virtual method 'boolean android.os.Handler.post(java.lang.Runnable)' on a null object reference
+[2026-11-04 14:48:25] [scrcpy] at com.genymobile.scrcpy.video.CameraCapture.adjustFocus(CameraCapture.java:663)
+[2026-11-04 14:48:25] [scrcpy] at com.genymobile.scrcpy.control.Controller.handleEvent(Controller.java:437)
+[2026-11-04 14:48:25] [scrcpy] at com.genymobile.scrcpy.control.Controller.control(Controller.java:246)
+[2026-11-04 14:48:25] [scrcpy] at com.genymobile.scrcpy.control.Controller.lambda$start$2$com-genymobile-scrcpy-control-Controller(Controller.java:281)
+[2026-11-04 14:48:25] [scrcpy] at com.genymobile.scrcpy.control.Controller$$ExternalSyntheticLambda1.run(D8$$SyntheticClass:0)
+[2026-11-04 14:48:25] [scrcpy] at java.lang.Thread.run(Thread.java:1571)
+[2026-11-04 14:48:25] [scrcpy] Killed
+[2026-11-04 14:48:25] Process exited with code 2
+[2026-11-04 14:48:28] [scrcpy] scrcpy 5.0.1 <https://github.com/Genymobile/scrcpy>
+[2026-11-04 14:48:28] [scrcpy] INFO: ADB device found:
+[2026-11-04 14:48:28] [scrcpy] INFO:     -->   (usb)  R3CW20AT3VY                     device  SM_S918N
+[2026-11-04 14:48:28] [scrcpy] D:\project\scrcpy\release\scrcpy-win64-v5.0.1\scrcpy-win64-v5.0.1\scrcpy-server: 1 file pushed, 0 skipped. 30.3 MB/s (737902 bytes in 0.023s)
+[2026-11-04 14:48:28] [scrcpy] [server] INFO: Device: [samsung] samsung SM-S918N (Android 16)
+[2026-11-04 14:48:28] [scrcpy] INFO: Renderer: direct3d11
+[2026-11-04 14:48:28] [scrcpy] INFO: Interop: d3d11va
+[2026-11-04 14:48:28] [scrcpy] INFO: Video decoding: d3d11va
+[2026-11-04 14:48:28] [scrcpy] ERROR: Demuxer 'video': stream disabled due to connection error
+[2026-11-04 14:48:28] [scrcpy] ERROR: Demuxer error
+[2026-11-04 14:48:28] [scrcpy] [server] ERROR: Exception on thread Thread[control-recv,5,main]
+[2026-11-04 14:48:28] [scrcpy] java.lang.NullPointerException: Attempt to invoke virtual method 'boolean android.os.Handler.post(java.lang.Runnable)' on a null object reference
+[2026-11-04 14:48:28] [scrcpy] at com.genymobile.scrcpy.video.CameraCapture.adjustFocus(CameraCapture.java:663)
+[2026-11-04 14:48:28] [scrcpy] at com.genymobile.scrcpy.control.Controller.handleEvent(Controller.java:437)
+[2026-11-04 14:48:28] [scrcpy] at com.genymobile.scrcpy.control.Controller.control(Controller.java:246)
+[2026-11-04 14:48:28] [scrcpy] at com.genymobile.scrcpy.control.Controller.lambda$start$2$com-genymobile-scrcpy-control-Controller(Controller.java:281)
+[2026-11-04 14:48:28] [scrcpy] at com.genymobile.scrcpy.control.Controller$$ExternalSyntheticLambda1.run(D8$$SyntheticClass:0)
+[2026-11-04 14:48:28] [scrcpy] at java.lang.Thread.run(Thread.java:1571)
+[2026-11-04 14:48:28] [scrcpy] Killed
+[2026-11-04 14:48:29] Process exited with code 1
+[2026-11-04 14:48:31] [scrcpy] scrcpy 5.0.1 <https://github.com/Genymobile/scrcpy>
+[2026-11-04 14:48:31] [scrcpy] INFO: ADB device found:
+[2026-11-04 14:48:31] [scrcpy] INFO:     -->   (usb)  R3CW20AT3VY                     device  SM_S918N
+[2026-11-04 14:48:31] [scrcpy] D:\project\scrcpy\release\scrcpy-win64-v5.0.1\scrcpy-win64-v5.0.1\scrcpy-server: 1 file pushed, 0 skipped. 35.4 MB/s (737902 bytes in 0.020s)
+[2026-11-04 14:48:32] [scrcpy] [server] INFO: Device: [samsung] samsung SM-S918N (Android 16)
+[2026-11-04 14:48:32] [scrcpy] INFO: Renderer: direct3d11
+[2026-11-04 14:48:32] [scrcpy] INFO: Interop: d3d11va
+[2026-11-04 14:48:32] [scrcpy] INFO: Video decoding: d3d11va
+[2026-11-04 14:48:32] [scrcpy] ERROR: Demuxer 'video': stream disabled due to connection error
+[2026-11-04 14:48:32] [scrcpy] ERROR: Demuxer error
+[2026-11-04 14:48:32] [scrcpy] [server] ERROR: Exception on thread Thread[control-recv,5,main]
+[2026-11-04 14:48:32] [scrcpy] java.lang.NullPointerException: Attempt to invoke virtual method 'boolean android.os.Handler.post(java.lang.Runnable)' on a null object reference
+[2026-11-04 14:48:32] [scrcpy] at com.genymobile.scrcpy.video.CameraCapture.adjustFocus(CameraCapture.java:663)
+[2026-11-04 14:48:32] [scrcpy] at com.genymobile.scrcpy.control.Controller.handleEvent(Controller.java:437)
+[2026-11-04 14:48:32] [scrcpy] at com.genymobile.scrcpy.control.Controller.control(Controller.java:246)
+[2026-11-04 14:48:32] [scrcpy] at com.genymobile.scrcpy.control.Controller.lambda$start$2$com-genymobile-scrcpy-control-Controller(Controller.java:281)
+[2026-11-04 14:48:32] [scrcpy] at com.genymobile.scrcpy.control.Controller$$ExternalSyntheticLambda1.run(D8$$SyntheticClass:0)
+[2026-11-04 14:48:32] [scrcpy] at java.lang.Thread.run(Thread.java:1571)
+[2026-11-04 14:48:32] [scrcpy] Killed
+[2026-11-04 14:48:32] Process exited with code 1
+[2026-11-04 14:48:35] [scrcpy] scrcpy 5.0.1 <https://github.com/Genymobile/scrcpy>
+[2026-11-04 14:48:35] [scrcpy] INFO: ADB device found:
+[2026-11-04 14:48:35] [scrcpy] INFO:     -->   (usb)  R3CW20AT3VY                     device  SM_S918N
+[2026-11-04 14:48:35] [scrcpy] D:\project\scrcpy\release\scrcpy-win64-v5.0.1\scrcpy-win64-v5.0.1\scrcpy-server: 1 file pushed, 0 skipped. 37.1 MB/s (737902 bytes in 0.019s)
+[2026-11-04 14:48:35] [scrcpy] [server] INFO: Device: [samsung] samsung SM-S918N (Android 16)
+[2026-11-04 14:48:35] [scrcpy] INFO: Renderer: direct3d11
+[2026-11-04 14:48:35] [scrcpy] INFO: Interop: d3d11va
+[2026-11-04 14:48:35] [scrcpy] INFO: Video decoding: d3d11va
+[2026-11-04 14:48:35] [scrcpy] ERROR: Demuxer 'video': stream disabled due to connection error
+[2026-11-04 14:48:35] [scrcpy] WARN: Device disconnected
+[2026-11-04 14:48:35] [scrcpy] [server] ERROR: Exception on thread Thread[control-recv,5,main]
+[2026-11-04 14:48:35] [scrcpy] java.lang.NullPointerException: Attempt to invoke virtual method 'boolean android.os.Handler.post(java.lang.Runnable)' on a null object reference
+[2026-11-04 14:48:35] [scrcpy] at com.genymobile.scrcpy.video.CameraCapture.adjustFocus(CameraCapture.java:663)
+[2026-11-04 14:48:35] [scrcpy] at com.genymobile.scrcpy.control.Controller.handleEvent(Controller.java:437)
+[2026-11-04 14:48:35] [scrcpy] at com.genymobile.scrcpy.control.Controller.control(Controller.java:246)
+[2026-11-04 14:48:35] [scrcpy] at com.genymobile.scrcpy.control.Controller.lambda$start$2$com-genymobile-scrcpy-control-Controller(Controller.java:281)
+[2026-11-04 14:48:35] [scrcpy] at com.genymobile.scrcpy.control.Controller$$ExternalSyntheticLambda1.run(D8$$SyntheticClass:0)
+[2026-11-04 14:48:35] [scrcpy] at java.lang.Thread.run(Thread.java:1571)
+[2026-11-04 14:48:35] [scrcpy] Killed
+[2026-11-04 14:48:36] Process exited with code 2
+[2026-11-04 14:48:38] [scrcpy] scrcpy 5.0.1 <https://github.com/Genymobile/scrcpy>
+[2026-11-04 14:48:38] [scrcpy] INFO: ADB device found:
+[2026-11-04 14:48:38] [scrcpy] INFO:     -->   (usb)  R3CW20AT3VY                     device  SM_S918N
+[2026-11-04 14:48:38] [scrcpy] D:\project\scrcpy\release\scrcpy-win64-v5.0.1\scrcpy-win64-v5.0.1\scrcpy-server: 1 file pushed, 0 skipped. 42.0 MB/s (737902 bytes in 0.017s)
+[2026-11-04 14:48:39] [scrcpy] [server] INFO: Device: [samsung] samsung SM-S918N (Android 16)
+[2026-11-04 14:48:39] [scrcpy] INFO: Renderer: direct3d11
+[2026-11-04 14:48:39] [scrcpy] INFO: Interop: d3d11va
+[2026-11-04 14:48:39] [scrcpy] INFO: Video decoding: d3d11va
+[2026-11-04 14:48:39] [scrcpy] ERROR: Demuxer 'video': stream disabled due to connection error
+[2026-11-04 14:48:39] [scrcpy] WARN: Device disconnected
+[2026-11-04 14:48:39] [scrcpy] [server] ERROR: Exception on thread Thread[control-recv,5,main]
+[2026-11-04 14:48:39] [scrcpy] java.lang.NullPointerException: Attempt to invoke virtual method 'boolean android.os.Handler.post(java.lang.Runnable)' on a null object reference
+[2026-11-04 14:48:39] [scrcpy] at com.genymobile.scrcpy.video.CameraCapture.adjustFocus(CameraCapture.java:663)
+[2026-11-04 14:48:39] [scrcpy] at com.genymobile.scrcpy.control.Controller.handleEvent(Controller.java:437)
+[2026-11-04 14:48:39] [scrcpy] at com.genymobile.scrcpy.control.Controller.control(Controller.java:246)
+[2026-11-04 14:48:39] [scrcpy] at com.genymobile.scrcpy.control.Controller.lambda$start$2$com-genymobile-scrcpy-control-Controller(Controller.java:281)
+[2026-11-04 14:48:39] [scrcpy] at com.genymobile.scrcpy.control.Controller$$ExternalSyntheticLambda1.run(D8$$SyntheticClass:0)
+[2026-11-04 14:48:39] [scrcpy] at java.lang.Thread.run(Thread.java:1571)
+[2026-11-04 14:48:39] [scrcpy] Killed
+[2026-11-04 14:48:39] Process exited with code 2
+[2026-11-04 14:48:42] [scrcpy] scrcpy 5.0.1 <https://github.com/Genymobile/scrcpy>
+[2026-11-04 14:48:42] [scrcpy] INFO: ADB device found:
+[2026-11-04 14:48:42] [scrcpy] INFO:     -->   (usb)  R3CW20AT3VY                     device  SM_S918N
+[2026-11-04 14:48:42] [scrcpy] D:\project\scrcpy\release\scrcpy-win64-v5.0.1\scrcpy-win64-v5.0.1\scrcpy-server: 1 file pushed, 0 skipped. 36.6 MB/s (737902 bytes in 0.019s)
+[2026-11-04 14:48:42] [scrcpy] [server] INFO: Device: [samsung] samsung SM-S918N (Android 16)
+[2026-11-04 14:48:42] [scrcpy] INFO: Renderer: direct3d11
+[2026-11-04 14:48:42] [scrcpy] INFO: Interop: d3d11va
+[2026-11-04 14:48:42] [scrcpy] INFO: Video decoding: d3d11va
+[2026-11-04 14:48:42] [scrcpy] ERROR: Demuxer 'video': stream disabled due to connection error
+[2026-11-04 14:48:42] [scrcpy] ERROR: Demuxer error
+[2026-11-04 14:48:42] [scrcpy] [server] ERROR: Exception on thread Thread[control-recv,5,main]
+[2026-11-04 14:48:42] [scrcpy] java.lang.NullPointerException: Attempt to invoke virtual method 'boolean android.os.Handler.post(java.lang.Runnable)' on a null object reference
+[2026-11-04 14:48:42] [scrcpy] at com.genymobile.scrcpy.video.CameraCapture.adjustFocus(CameraCapture.java:663)
+[2026-11-04 14:48:42] [scrcpy] at com.genymobile.scrcpy.control.Controller.handleEvent(Controller.java:437)
+[2026-11-04 14:48:42] [scrcpy] at com.genymobile.scrcpy.control.Controller.control(Controller.java:246)
+[2026-11-04 14:48:43] [scrcpy] at com.genymobile.scrcpy.control.Controller.lambda$start$2$com-genymobile-scrcpy-control-Controller(Controller.java:281)
+[2026-11-04 14:48:43] [scrcpy] at com.genymobile.scrcpy.control.Controller$$ExternalSyntheticLambda1.run(D8$$SyntheticClass:0)
+[2026-11-04 14:48:43] [scrcpy] at java.lang.Thread.run(Thread.java:1571)
+[2026-11-04 14:48:43] [scrcpy] Killed
+[2026-11-04 14:48:43] Process exited with code 1
+[2026-11-04 14:48:45] [scrcpy] scrcpy 5.0.1 <https://github.com/Genymobile/scrcpy>
+[2026-11-04 14:48:46] [scrcpy] INFO: ADB device found:
+[2026-11-04 14:48:46] [scrcpy] INFO:     -->   (usb)  R3CW20AT3VY                     device  SM_S918N
+[2026-11-04 14:48:46] [scrcpy] D:\project\scrcpy\release\scrcpy-win64-v5.0.1\scrcpy-win64-v5.0.1\scrcpy-server: 1 file pushed, 0 skipped. 41.9 MB/s (737902 bytes in 0.017s)
+[2026-11-04 14:48:46] [scrcpy] [server] INFO: Device: [samsung] samsung SM-S918N (Android 16)
+[2026-11-04 14:48:46] [scrcpy] INFO: Renderer: direct3d11
+[2026-11-04 14:48:46] [scrcpy] INFO: Interop: d3d11va
+[2026-11-04 14:48:46] [scrcpy] INFO: Video decoding: d3d11va
+[2026-11-04 14:48:46] [scrcpy] ERROR: Demuxer 'video': stream disabled due to connection error
+[2026-11-04 14:48:46] [scrcpy] WARN: Device disconnected
+[2026-11-04 14:48:46] [scrcpy] [server] ERROR: Exception on thread Thread[control-recv,5,main]
+[2026-11-04 14:48:46] [scrcpy] java.lang.NullPointerException: Attempt to invoke virtual method 'boolean android.os.Handler.post(java.lang.Runnable)' on a null object reference
+[2026-11-04 14:48:46] [scrcpy] at com.genymobile.scrcpy.video.CameraCapture.adjustFocus(CameraCapture.java:663)
+[2026-11-04 14:48:46] [scrcpy] at com.genymobile.scrcpy.control.Controller.handleEvent(Controller.java:437)
+[2026-11-04 14:48:46] [scrcpy] at com.genymobile.scrcpy.control.Controller.control(Controller.java:246)
+[2026-11-04 14:48:46] [scrcpy] at com.genymobile.scrcpy.control.Controller.lambda$start$2$com-genymobile-scrcpy-control-Controller(Controller.java:281)
+[2026-11-04 14:48:46] [scrcpy] at com.genymobile.scrcpy.control.Controller$$ExternalSyntheticLambda1.run(D8$$SyntheticClass:0)
+[2026-11-04 14:48:46] [scrcpy] at java.lang.Thread.run(Thread.java:1571)
+[2026-11-04 14:48:46] [scrcpy] Killed
+[2026-11-04 14:48:46] Process exited with code 2
+[2026-11-04 14:48:49] [scrcpy] scrcpy 5.0.1 <https://github.com/Genymobile/scrcpy>
+[2026-11-04 14:48:49] [scrcpy] INFO: ADB device found:
+[2026-11-04 14:48:49] [scrcpy] INFO:     -->   (usb)  R3CW20AT3VY                     device  SM_S918N
+[2026-11-04 14:48:49] [scrcpy] D:\project\scrcpy\release\scrcpy-win64-v5.0.1\scrcpy-win64-v5.0.1\scrcpy-server: 1 file pushed, 0 skipped. 39.5 MB/s (737902 bytes in 0.018s)
+[2026-11-04 14:48:49] [scrcpy] [server] INFO: Device: [samsung] samsung SM-S918N (Android 16)
+[2026-11-04 14:48:49] [scrcpy] INFO: Renderer: direct3d11
+[2026-11-04 14:48:49] [scrcpy] INFO: Interop: d3d11va
+[2026-11-04 14:48:49] [scrcpy] INFO: Video decoding: d3d11va
+[2026-11-04 14:48:49] [scrcpy] ERROR: Demuxer 'video': stream disabled due to connection error
+[2026-11-04 14:48:49] [scrcpy] ERROR: Demuxer error
+[2026-11-04 14:48:49] [scrcpy] [server] ERROR: Exception on thread Thread[control-recv,5,main]
+[2026-11-04 14:48:50] [scrcpy] java.lang.NullPointerException: Attempt to invoke virtual method 'boolean android.os.Handler.post(java.lang.Runnable)' on a null object reference
+[2026-11-04 14:48:50] [scrcpy] at com.genymobile.scrcpy.video.CameraCapture.adjustFocus(CameraCapture.java:663)
+[2026-11-04 14:48:50] [scrcpy] at com.genymobile.scrcpy.control.Controller.handleEvent(Controller.java:437)
+[2026-11-04 14:48:50] [scrcpy] at com.genymobile.scrcpy.control.Controller.control(Controller.java:246)
+[2026-11-04 14:48:50] [scrcpy] at com.genymobile.scrcpy.control.Controller.lambda$start$2$com-genymobile-scrcpy-control-Controller(Controller.java:281)
+[2026-11-04 14:48:50] [scrcpy] at com.genymobile.scrcpy.control.Controller$$ExternalSyntheticLambda1.run(D8$$SyntheticClass:0)
+[2026-11-04 14:48:50] [scrcpy] at java.lang.Thread.run(Thread.java:1571)
+[2026-11-04 14:48:50] [scrcpy] Killed
+[2026-11-04 14:48:50] Process exited with code 1
+[2026-11-04 14:48:52] [scrcpy] scrcpy 5.0.1 <https://github.com/Genymobile/scrcpy>
+[2026-11-04 14:48:52] [scrcpy] INFO: ADB device found:
+[2026-11-04 14:48:53] [scrcpy] INFO:     -->   (usb)  R3CW20AT3VY                     device  SM_S918N
+[2026-11-04 14:48:53] [scrcpy] D:\project\scrcpy\release\scrcpy-win64-v5.0.1\scrcpy-win64-v5.0.1\scrcpy-server: 1 file pushed, 0 skipped. 31.1 MB/s (737902 bytes in 0.023s)
+[2026-11-04 14:48:53] [scrcpy] [server] INFO: Device: [samsung] samsung SM-S918N (Android 16)
+[2026-11-04 14:48:53] [scrcpy] INFO: Renderer: direct3d11
+[2026-11-04 14:48:53] [scrcpy] INFO: Interop: d3d11va
+[2026-11-04 14:48:53] [scrcpy] INFO: Video decoding: d3d11va
+[2026-11-04 14:48:53] [scrcpy] ERROR: Demuxer 'video': stream disabled due to connection error
+[2026-11-04 14:48:53] [scrcpy] ERROR: Demuxer error
+[2026-11-04 14:48:53] [scrcpy] [server] ERROR: Exception on thread Thread[control-recv,5,main]
+[2026-11-04 14:48:53] [scrcpy] java.lang.NullPointerException: Attempt to invoke virtual method 'boolean android.os.Handler.post(java.lang.Runnable)' on a null object reference
+[2026-11-04 14:48:53] [scrcpy] at com.genymobile.scrcpy.video.CameraCapture.adjustFocus(CameraCapture.java:663)
+[2026-11-04 14:48:53] [scrcpy] at com.genymobile.scrcpy.control.Controller.handleEvent(Controller.java:437)
+[2026-11-04 14:48:53] [scrcpy] at com.genymobile.scrcpy.control.Controller.control(Controller.java:246)
+[2026-11-04 14:48:53] [scrcpy] at com.genymobile.scrcpy.control.Controller.lambda$start$2$com-genymobile-scrcpy-control-Controller(Controller.java:281)
+[2026-11-04 14:48:53] [scrcpy] at com.genymobile.scrcpy.control.Controller$$ExternalSyntheticLambda1.run(D8$$SyntheticClass:0)
+[2026-11-04 14:48:53] [scrcpy] at java.lang.Thread.run(Thread.java:1571)
+[2026-11-04 14:48:53] [scrcpy] Killed
+[2026-11-04 14:48:53] Process exited with code 1
+[2026-11-04 14:48:56] [scrcpy] scrcpy 5.0.1 <https://github.com/Genymobile/scrcpy>
+[2026-11-04 14:48:56] [scrcpy] INFO: ADB device found:
+[2026-11-04 14:48:56] [scrcpy] INFO:     -->   (usb)  R3CW20AT3VY                     device  SM_S918N
+[2026-11-04 14:48:56] [scrcpy] D:\project\scrcpy\release\scrcpy-win64-v5.0.1\scrcpy-win64-v5.0.1\scrcpy-server: 1 file pushed, 0 skipped. 34.7 MB/s (737902 bytes in 0.020s)
+[2026-11-04 14:48:56] [scrcpy] [server] INFO: Device: [samsung] samsung SM-S918N (Android 16)
+[2026-11-04 14:48:56] [scrcpy] INFO: Renderer: direct3d11
+[2026-11-04 14:48:56] [scrcpy] INFO: Interop: d3d11va
+[2026-11-04 14:48:56] [scrcpy] INFO: Video decoding: d3d11va
+[2026-11-04 14:48:56] [scrcpy] ERROR: Demuxer 'video': stream disabled due to connection error
+[2026-11-04 14:48:56] [scrcpy] ERROR: Demuxer error
+[2026-11-04 14:48:56] [scrcpy] [server] ERROR: Exception on thread Thread[control-recv,5,main]
+[2026-11-04 14:48:56] [scrcpy] java.lang.NullPointerException: Attempt to invoke virtual method 'boolean android.os.Handler.post(java.lang.Runnable)' on a null object reference
+[2026-11-04 14:48:57] [scrcpy] at com.genymobile.scrcpy.video.CameraCapture.adjustFocus(CameraCapture.java:663)
+[2026-11-04 14:48:57] [scrcpy] at com.genymobile.scrcpy.control.Controller.handleEvent(Controller.java:437)
+[2026-11-04 14:48:57] [scrcpy] at com.genymobile.scrcpy.control.Controller.control(Controller.java:246)
+[2026-11-04 14:48:57] [scrcpy] at com.genymobile.scrcpy.control.Controller.lambda$start$2$com-genymobile-scrcpy-control-Controller(Controller.java:281)
+[2026-11-04 14:48:57] [scrcpy] at com.genymobile.scrcpy.control.Controller$$ExternalSyntheticLambda1.run(D8$$SyntheticClass:0)
+[2026-11-04 14:48:57] [scrcpy] at java.lang.Thread.run(Thread.java:1571)
+[2026-11-04 14:48:57] [scrcpy] Killed
+[2026-11-04 14:48:57] Process exited with code 1
+[2026-11-04 14:48:59] [scrcpy] scrcpy 5.0.1 <https://github.com/Genymobile/scrcpy>
+[2026-11-04 14:49:00] [scrcpy] INFO: ADB device found:
+[2026-11-04 14:49:00] [scrcpy] INFO:     -->   (usb)  R3CW20AT3VY                     device  SM_S918N
+[2026-11-04 14:49:00] [scrcpy] D:\project\scrcpy\release\scrcpy-win64-v5.0.1\scrcpy-win64-v5.0.1\scrcpy-server: 1 file pushed, 0 skipped. 35.1 MB/s (737902 bytes in 0.020s)
+[2026-11-04 14:49:00] [scrcpy] [server] INFO: Device: [samsung] samsung SM-S918N (Android 16)
+[2026-11-04 14:49:00] [scrcpy] INFO: Renderer: direct3d11
+[2026-11-04 14:49:00] [scrcpy] INFO: Interop: d3d11va
+[2026-11-04 14:49:00] [scrcpy] INFO: Video decoding: d3d11va
+[2026-11-04 14:49:00] [scrcpy] ERROR: Demuxer 'video': stream disabled due to connection error
+[2026-11-04 14:49:00] [scrcpy] ERROR: Demuxer error
+[2026-11-04 14:49:00] [scrcpy] [server] ERROR: Exception on thread Thread[control-recv,5,main]
+[2026-11-04 14:49:00] [scrcpy] java.lang.NullPointerException: Attempt to invoke virtual method 'boolean android.os.Handler.post(java.lang.Runnable)' on a null object reference
+[2026-11-04 14:49:00] [scrcpy] at com.genymobile.scrcpy.video.CameraCapture.adjustFocus(CameraCapture.java:663)
+[2026-11-04 14:49:00] [scrcpy] at com.genymobile.scrcpy.control.Controller.handleEvent(Controller.java:437)
+[2026-11-04 14:49:00] [scrcpy] at com.genymobile.scrcpy.control.Controller.control(Controller.java:246)
+[2026-11-04 14:49:00] [scrcpy] at com.genymobile.scrcpy.control.Controller.lambda$start$2$com-genymobile-scrcpy-control-Controller(Controller.java:281)
+[2026-11-04 14:49:00] [scrcpy] at com.genymobile.scrcpy.control.Controller$$ExternalSyntheticLambda1.run(D8$$SyntheticClass:0)
+[2026-11-04 14:49:00] [scrcpy] at java.lang.Thread.run(Thread.java:1571)
+[2026-11-04 14:49:00] [scrcpy] Killed
+[2026-11-04 14:49:00] Process exited with code 1
+[2026-11-04 14:49:03] [scrcpy] scrcpy 5.0.1 <https://github.com/Genymobile/scrcpy>
+[2026-11-04 14:49:03] [scrcpy] INFO: ADB device found:
+[2026-11-04 14:49:03] [scrcpy] INFO:     -->   (usb)  R3CW20AT3VY                     device  SM_S918N
+[2026-11-04 14:49:03] [scrcpy] D:\project\scrcpy\release\scrcpy-win64-v5.0.1\scrcpy-win64-v5.0.1\scrcpy-server: 1 file pushed, 0 skipped. 33.5 MB/s (737902 bytes in 0.021s)
+[2026-11-04 14:49:03] [scrcpy] [server] INFO: Device: [samsung] samsung SM-S918N (Android 16)
+[2026-11-04 14:49:04] [scrcpy] INFO: Renderer: direct3d11
+[2026-11-04 14:49:04] [scrcpy] INFO: Interop: d3d11va
+[2026-11-04 14:49:04] [scrcpy] INFO: Video decoding: d3d11va
+[2026-11-04 14:49:04] [scrcpy] ERROR: Demuxer 'video': stream disabled due to connection error
+[2026-11-04 14:49:04] [scrcpy] ERROR: Demuxer error
+[2026-11-04 14:49:04] [scrcpy] [server] ERROR: Exception on thread Thread[control-recv,5,main]
+[2026-11-04 14:49:04] [scrcpy] java.lang.NullPointerException: Attempt to invoke virtual method 'boolean android.os.Handler.post(java.lang.Runnable)' on a null object reference
+[2026-11-04 14:49:04] [scrcpy] at com.genymobile.scrcpy.video.CameraCapture.adjustFocus(CameraCapture.java:663)
+[2026-11-04 14:49:04] [scrcpy] at com.genymobile.scrcpy.control.Controller.handleEvent(Controller.java:437)
+[2026-11-04 14:49:04] [scrcpy] at com.genymobile.scrcpy.control.Controller.control(Controller.java:246)
+[2026-11-04 14:49:04] [scrcpy] at com.genymobile.scrcpy.control.Controller.lambda$start$2$com-genymobile-scrcpy-control-Controller(Controller.java:281)
+[2026-11-04 14:49:04] [scrcpy] at com.genymobile.scrcpy.control.Controller$$ExternalSyntheticLambda1.run(D8$$SyntheticClass:0)
+[2026-11-04 14:49:04] [scrcpy] at java.lang.Thread.run(Thread.java:1571)
+[2026-11-04 14:49:04] [scrcpy] Killed
+[2026-11-04 14:49:04] Process exited with code 1
+[2026-11-04 14:49:07] [scrcpy] scrcpy 5.0.1 <https://github.com/Genymobile/scrcpy>
+[2026-11-04 14:49:07] [scrcpy] INFO: ADB device found:
+[2026-11-04 14:49:07] [scrcpy] INFO:     -->   (usb)  R3CW20AT3VY                     device  SM_S918N
+[2026-11-04 14:49:07] [scrcpy] D:\project\scrcpy\release\scrcpy-win64-v5.0.1\scrcpy-win64-v5.0.1\scrcpy-server: 1 file pushed, 0 skipped. 31.0 MB/s (737902 bytes in 0.023s)
+[2026-11-04 14:49:07] [scrcpy] [server] INFO: Device: [samsung] samsung SM-S918N (Android 16)
+[2026-11-04 14:49:07] [scrcpy] INFO: Renderer: direct3d11
+[2026-11-04 14:49:07] [scrcpy] INFO: Interop: d3d11va
+[2026-11-04 14:49:07] [scrcpy] INFO: Video decoding: d3d11va
+[2026-11-04 14:49:07] [scrcpy] ERROR: Demuxer 'video': stream disabled due to connection error
+[2026-11-04 14:49:07] [scrcpy] WARN: Device disconnected
+[2026-11-04 14:49:07] [scrcpy] [server] ERROR: Exception on thread Thread[control-recv,5,main]
+[2026-11-04 14:49:07] [scrcpy] java.lang.NullPointerException: Attempt to invoke virtual method 'boolean android.os.Handler.post(java.lang.Runnable)' on a null object reference
+[2026-11-04 14:49:07] [scrcpy] at com.genymobile.scrcpy.video.CameraCapture.adjustFocus(CameraCapture.java:663)
+[2026-11-04 14:49:07] [scrcpy] at com.genymobile.scrcpy.control.Controller.handleEvent(Controller.java:437)
+[2026-11-04 14:49:07] [scrcpy] at com.genymobile.scrcpy.control.Controller.control(Controller.java:246)
+[2026-11-04 14:49:07] [scrcpy] at com.genymobile.scrcpy.control.Controller.lambda$start$2$com-genymobile-scrcpy-control-Controller(Controller.java:281)
+[2026-11-04 14:49:07] [scrcpy] at com.genymobile.scrcpy.control.Controller$$ExternalSyntheticLambda1.run(D8$$SyntheticClass:0)
+[2026-11-04 14:49:07] [scrcpy] at java.lang.Thread.run(Thread.java:1571)
+[2026-11-04 14:49:07] [scrcpy] Killed
+[2026-11-04 14:49:07] Process exited with code 2
+[2026-11-04 14:49:10] [scrcpy] scrcpy 5.0.1 <https://github.com/Genymobile/scrcpy>
+[2026-11-04 14:49:10] [scrcpy] INFO: ADB device found:
+[2026-11-04 14:49:10] [scrcpy] INFO:     -->   (usb)  R3CW20AT3VY                     device  SM_S918N
+[2026-11-04 14:49:11] [scrcpy] D:\project\scrcpy\release\scrcpy-win64-v5.0.1\scrcpy-win64-v5.0.1\scrcpy-server: 1 file pushed, 0 skipped. 33.8 MB/s (737902 bytes in 0.021s)
+[2026-11-04 14:49:11] [scrcpy] [server] INFO: Device: [samsung] samsung SM-S918N (Android 16)
+[2026-11-04 14:49:11] [scrcpy] [server] INFO: Using camera '0'
+[2026-11-04 14:49:11] [scrcpy] INFO: Renderer: direct3d11
+[2026-11-04 14:49:11] [scrcpy] INFO: Interop: d3d11va
+[2026-11-04 14:49:11] [scrcpy] INFO: Video decoding: d3d11va
+[2026-11-04 14:49:11] [scrcpy] [server] INFO: Camera characteristics - focusDist: 10.0, activeArray: Rect(0, 0 - 4080, 3060), maxDigitalZoom: 8.0
+[2026-11-04 14:49:12] [scrcpy] INFO: Texture (D3D11VA): 1920x1088
+[2026-11-04 14:49:19] Process exited with code 0
+[2026-11-04 14:49:22] [scrcpy] scrcpy 5.0.1 <https://github.com/Genymobile/scrcpy>
+[2026-11-04 14:49:22] [scrcpy] INFO: ADB device found:
+[2026-11-04 14:49:22] [scrcpy] INFO:     -->   (usb)  R3CW20AT3VY                     device  SM_S918N
+[2026-11-04 14:49:22] [scrcpy] D:\project\scrcpy\release\scrcpy-win64-v5.0.1\scrcpy-win64-v5.0.1\scrcpy-server: 1 file pushed, 0 skipped. 36.1 MB/s (737902 bytes in 0.020s)
+[2026-11-04 14:49:22] [scrcpy] [server] INFO: Device: [samsung] samsung SM-S918N (Android 16)
+[2026-11-04 14:49:23] [scrcpy] INFO: Renderer: direct3d11
+[2026-11-04 14:49:23] [scrcpy] INFO: Interop: d3d11va
+[2026-11-04 14:49:23] [scrcpy] [server] INFO: Using camera '0'
+[2026-11-04 14:49:23] [scrcpy] INFO: Video decoding: d3d11va
+[2026-11-04 14:49:23] [scrcpy] [server] INFO: Camera characteristics - focusDist: 10.0, activeArray: Rect(0, 0 - 4080, 3060), maxDigitalZoom: 8.0
+[2026-11-04 14:49:24] [scrcpy] INFO: Texture (D3D11VA): 1920x1088
+[2026-11-04 14:49:25] Process exited with code 0
+[2026-11-04 14:49:28] [scrcpy] scrcpy 5.0.1 <https://github.com/Genymobile/scrcpy>
+[2026-11-04 14:49:28] [scrcpy] INFO: ADB device found:
+[2026-11-04 14:49:28] [scrcpy] INFO:     -->   (usb)  R3CW20AT3VY                     device  SM_S918N
+[2026-11-04 14:49:28] [scrcpy] D:\project\scrcpy\release\scrcpy-win64-v5.0.1\scrcpy-win64-v5.0.1\scrcpy-server: 1 file pushed, 0 skipped. 32.5 MB/s (737902 bytes in 0.022s)
+[2026-11-04 14:49:29] [scrcpy] [server] INFO: Device: [samsung] samsung SM-S918N (Android 16)
+[2026-11-04 14:49:29] [scrcpy] INFO: Renderer: direct3d11
+[2026-11-04 14:49:29] [scrcpy] INFO: Interop: d3d11va
+[2026-11-04 14:49:29] [scrcpy] INFO: Video decoding: d3d11va
+[2026-11-04 14:49:29] [scrcpy] ERROR: Demuxer 'video': stream disabled due to connection error
+[2026-11-04 14:49:29] [scrcpy] ERROR: Demuxer error
+[2026-11-04 14:49:29] [scrcpy] [server] ERROR: Exception on thread Thread[control-recv,5,main]
+[2026-11-04 14:49:29] [scrcpy] java.lang.NullPointerException: Attempt to invoke virtual method 'boolean android.os.Handler.post(java.lang.Runnable)' on a null object reference
+[2026-11-04 14:49:29] [scrcpy] at com.genymobile.scrcpy.video.CameraCapture.adjustFocus(CameraCapture.java:663)
+[2026-11-04 14:49:29] [scrcpy] at com.genymobile.scrcpy.control.Controller.handleEvent(Controller.java:437)
+[2026-11-04 14:49:29] [scrcpy] at com.genymobile.scrcpy.control.Controller.control(Controller.java:246)
+[2026-11-04 14:49:29] [scrcpy] at com.genymobile.scrcpy.control.Controller.lambda$start$2$com-genymobile-scrcpy-control-Controller(Controller.java:281)
+[2026-11-04 14:49:29] [scrcpy] at com.genymobile.scrcpy.control.Controller$$ExternalSyntheticLambda1.run(D8$$SyntheticClass:0)
+[2026-11-04 14:49:29] [scrcpy] at java.lang.Thread.run(Thread.java:1571)
+[2026-11-04 14:49:29] [scrcpy] Killed
+[2026-11-04 14:49:29] Process exited with code 1
