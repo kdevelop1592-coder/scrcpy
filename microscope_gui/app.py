@@ -508,7 +508,7 @@ class MicroscopeApp(ctk.CTk):
             flip_vertical=flip_v,
             camera_size=size_arg,
             camera_fps=fps_val,
-            video_bit_rate="12M",
+            video_bit_rate="8M",
             turn_screen_off=self.turn_screen_off_var.get(),
             no_audio=True,
             stay_awake=self.stay_awake_var.get(),

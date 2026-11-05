@@ -493,6 +493,9 @@ public class CameraCapture extends SurfaceCapture {
     }
 
     public void setTorchEnabled(boolean enabled) {
+        if (cameraHandler == null) {
+            return;
+        }
         cameraHandler.post(() -> {
             assertCameraThread();
             if (currentSession != null && requestBuilder != null) {
@@ -510,6 +513,9 @@ public class CameraCapture extends SurfaceCapture {
 
     @TargetApi(AndroidVersions.API_30_ANDROID_11)
     private void zoom(boolean in) {
+        if (cameraHandler == null) {
+            return;
+        }
         cameraHandler.post(() -> {
             assertCameraThread();
             if (currentSession != null && requestBuilder != null) {
@@ -532,6 +538,9 @@ public class CameraCapture extends SurfaceCapture {
     }
 
     public void zoomAt(com.genymobile.scrcpy.model.Position position, float scrollDelta) {
+        if (cameraHandler == null) {
+            return;
+        }
         cameraHandler.post(() -> {
             assertCameraThread();
             if (currentSession != null && requestBuilder != null) {
@@ -561,6 +570,9 @@ public class CameraCapture extends SurfaceCapture {
     }
 
     public void pan(float deltaXRatio, float deltaYRatio) {
+        if (cameraHandler == null) {
+            return;
+        }
         cameraHandler.post(() -> {
             assertCameraThread();
             if (currentSession != null && requestBuilder != null) {
@@ -572,6 +584,9 @@ public class CameraCapture extends SurfaceCapture {
     }
 
     public void resetZoom() {
+        if (cameraHandler == null) {
+            return;
+        }
         cameraHandler.post(() -> {
             assertCameraThread();
             if (currentSession != null && requestBuilder != null) {
@@ -660,6 +675,9 @@ public class CameraCapture extends SurfaceCapture {
     }
 
     public void adjustFocus(boolean nearer) {
+        if (cameraHandler == null) {
+            return;
+        }
         cameraHandler.post(() -> {
             assertCameraThread();
             if (currentSession != null && requestBuilder != null) {
@@ -692,6 +710,9 @@ public class CameraCapture extends SurfaceCapture {
     }
 
     public void resetAutoFocus() {
+        if (cameraHandler == null) {
+            return;
+        }
         cameraHandler.post(() -> {
             assertCameraThread();
             if (currentSession != null && requestBuilder != null) {
@@ -711,6 +732,9 @@ public class CameraCapture extends SurfaceCapture {
     }
 
     public void setFocusPoint(com.genymobile.scrcpy.model.Position position) {
+        if (cameraHandler == null) {
+            return;
+        }
         cameraHandler.post(() -> {
             assertCameraThread();
             if (currentSession != null && requestBuilder != null && position != null) {

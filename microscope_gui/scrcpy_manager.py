@@ -87,7 +87,7 @@ class ScrcpyManager:
         flip_vertical: bool = False,
         camera_size: Optional[str] = None,
         camera_fps: Optional[int] = 30,
-        video_bit_rate: Optional[str] = "12M",
+        video_bit_rate: Optional[str] = "8M",
         turn_screen_off: bool = False,
         no_audio: bool = True,
         stay_awake: bool = True,
